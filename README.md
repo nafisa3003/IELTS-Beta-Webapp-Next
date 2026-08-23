@@ -43,7 +43,7 @@ The application is an **ERD-driven Next.js + Supabase rebuild** focused on IELTS
 The application follows the approved **ERD as the primary source of truth** for its relational database architecture.
 
 **Final ERD:**  
-[`View ERD`](./docs/ERD/Final-ERD.png)
+[`View ERD`](./docs/assets/ERD/final-ERD.png)
 
 ---
 
