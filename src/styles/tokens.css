@@ -1,0 +1,69 @@
+/*
+  IELTS Beta 3.0 — Design Tokens (locked)
+  Sampled from the official logo. Do not change without explicit approval.
+*/
+
+:root {
+  /* Brand */
+  --navy: #123C6B;
+  --navy-deep: #0B2545;
+  --teal: #0EA599;
+  --teal-deep: #0B7A6E;
+
+  /* Secondary accent */
+  --violet: #9B8AFB;
+  --violet-deep: #7C6AE8;
+
+  /* Premium accent */
+  --coral: #FF6B4A;
+  --coral-deep: #E5502F;
+
+  /* Hero / Marketing cyan — approved for landing page v3 */
+  --cyan: #78FFF9;
+  --cyan-light: #F0FDFC;
+
+  /* Neutrals */
+  --ink: #0F1720;
+  --slate: #47566B;
+  --slate-soft: #8593A6;
+  --mist: #EEF2F6;
+  --paper: #F7F9FB;
+  --white: #FFFFFF;
+
+  /* Semantic */
+  --success: #1BA672;
+  --success-soft: #E4F6EE;
+  --warning: #E0A62B;
+  --warning-soft: #FCF3DD;
+  --danger: #E0524B;
+  --danger-soft: #FBE7E6;
+
+  /* Gamification */
+  --xp: #F5A524;
+  --xp-deep: #C6810E;
+  --gems: #3FC7EB;
+  --gems-deep: #1F9CBD;
+
+  /* Type */
+  --font-display: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Plus Jakarta Sans', ui-sans-serif, system-ui, sans-serif;
+
+  /* Radii / elevation */
+  --radius-sm: 8px;
+  --radius-md: 14px;
+  --radius-lg: 22px;
+  --radius-pill: 999px;
+  --shadow-card: 0 1px 2px rgba(11, 37, 69, 0.06), 0 8px 24px rgba(11, 37, 69, 0.08);
+  --shadow-float: 0 12px 32px rgba(11, 37, 69, 0.16);
+}
+
+.dark {
+  --ink: #F2F5F9;
+  --slate: #C3CEDB;
+  --slate-soft: #7C8CA1;
+  --mist: #14141B;
+  --paper: #0A0A0F;
+  --white: #0F0F14;
+  --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.35);
+  --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.45);
+}

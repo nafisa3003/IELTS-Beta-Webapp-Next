@@ -1,0 +1,136 @@
+@import "../styles/tokens.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: var(--font-body);
+  }
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    letter-spacing: -0.02em;
+  }
+  :focus-visible {
+    outline: 2px solid var(--teal);
+    outline-offset: 2px;
+    border-radius: var(--radius-sm);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+/* Logo glow — subtle everywhere, more pronounced against dark backgrounds
+   where the navy wordmark needs the lift to stay legible/premium. */
+.logo-glow {
+  filter: drop-shadow(0 0 6px rgba(14, 165, 153, 0.25));
+  transition: filter 0.2s ease;
+}
+.dark .logo-glow {
+  filter: drop-shadow(0 0 10px rgba(14, 165, 153, 0.55)) drop-shadow(0 0 20px rgba(14, 165, 153, 0.25));
+}
+/* For logos placed on an inherently dark surface (e.g. the hero's navy
+   gradient) regardless of the site-wide light/dark toggle. */
+.logo-glow-strong {
+  filter: drop-shadow(0 0 10px rgba(14, 165, 153, 0.55)) drop-shadow(0 0 20px rgba(14, 165, 153, 0.25));
+}
+
+/*GAMIFICATION ANIMATIONS*/
+
+@keyframes flame-flicker {
+  0%, 100% { transform: scale(1) rotate(-2deg); opacity: 1; }
+  25% { transform: scale(1.05) rotate(2deg); opacity: 0.9; }
+  50% { transform: scale(0.95) rotate(-1deg); opacity: 1; }
+  75% { transform: scale(1.02) rotate(1deg); opacity: 0.95; }
+}
+
+@keyframes flame-inner-flicker {
+  0%, 100% { opacity: 0.9; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(0.9); }
+}
+
+@keyframes gem-sparkle {
+  0%, 100% { filter: brightness(1); transform: scale(1); }
+  50% { filter: brightness(1.3); transform: scale(1.1); }
+}
+
+@keyframes badge-bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+@keyframes achievement-pop {
+  0% { transform: scale(0.8); opacity: 0; }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes progress-fill {
+  0% { width: 0%; }
+}
+
+@keyframes slide-in {
+  0% { transform: translateX(-20px); opacity: 0; }
+  100% { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes bounce-slow {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes pulse-slow {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+.animate-flame-flicker {
+  animation: flame-flicker 1.5s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+.animate-flame-inner {
+  animation: flame-inner-flicker 0.8s ease-in-out infinite;
+  transform-origin: bottom center;
+}
+
+.animate-gem-sparkle {
+  animation: gem-sparkle 2s ease-in-out infinite;
+}
+
+.animate-badge-bounce {
+  animation: badge-bounce 2s ease-in-out infinite;
+}
+
+.animate-achievement-pop {
+  animation: achievement-pop 0.5s ease-out forwards;
+}
+
+.animate-progress-fill {
+  animation: progress-fill 1.5s ease-out forwards;
+}
+
+.animate-slide-in {
+  animation: slide-in 0.4s ease-out forwards;
+  opacity: 0;
+}
+
+.animate-bounce-slow {
+  animation: bounce-slow 2s ease-in-out infinite;
+}
+
+.animate-pulse-slow {
+  animation: pulse-slow 3s ease-in-out infinite;
+}
