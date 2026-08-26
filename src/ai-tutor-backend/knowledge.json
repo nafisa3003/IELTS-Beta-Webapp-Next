@@ -1,0 +1,79 @@
+{
+  "centre_info": {
+    "name": "IELTS Beta Centre",
+    "address": "IELTS Beta Centre, Sylhet, Bangladesh",
+    "phone": "+880-173-8888888",
+    "email": "info@ieltsbeta.com",
+    "website": "www.ieltsbeta.com",
+    "opening_hours": "Monday–Saturday: 8:00 AM – 10:00 PM; Sunday: 9:00 AM – 6:00 PM",
+    "about": "IELTS Beta is a premium IELTS preparation centre in Sylhet committed to helping students achieve their target band score. Our team includes certified IDP and British Council IELTS examiners and Cambridge-trained coaches."
+  },
+  "venues": [
+    {
+      "name": "The Audio Lab",
+      "location": "Block A, 2nd Floor, Sylhet",
+      "description": "Professional Listening studio with authentic exam audio and noise-cancelling booths. 2026 Update: Includes simulated 'Video Call Speaking' audio landscapes.",
+      "services": [
+        "Listening Mock Tests (Academic & General)",
+        "Accent Exposure (British, Australian, American, Irish)",
+        "Section 3 & 4 Mastery Classes"
+      ],
+      "booking": "48 hours in advance via app",
+      "contact": "audiolab@ieltsbeta.com"
+    },
+    {
+      "name": "The Draftroom",
+      "location": "Block B, Ground Floor, Sylhet",
+      "description": "Writing workshop space with sample essay banks (Band 6–9) and individual feedback desks.",
+      "services": [
+        "Task 1: Academic Graphs & GT Letters",
+        "Task 2: Essay Logic & Structure",
+        "Grammar Clinics & Lexical Workshops"
+      ],
+      "booking": "Walk-in for groups; 24h booking for 1-to-1",
+      "contact": "draftroom@ieltsbeta.com"
+    },
+    {
+      "name": "The Studio",
+      "location": "Block C, 1st Floor, Sylhet",
+      "description": "Multimedia Speaking studio with AI-powered simulators and video playback for self-review.",
+      "services": [
+        "Mock Tests with Certified Examiners",
+        "AI Examiner Simulations",
+        "Pronunciation & Fluency Coaching"
+      ],
+      "booking": "12-hour advance booking required",
+      "contact": "studio@ieltsbeta.com"
+    }
+  ],
+  "global_2026_updates": {
+    "one_skill_retake": "Available for Computer-Delivered tests. Allows retaking one module within 60 days of the original test.",
+    "computer_delivered_standard": "As of 2026, Computer-Delivered IELTS is the primary format. Results are typically released in 2-5 days.",
+    "video_call_speaking": "Speaking tests may be conducted via high-definition video link with a live examiner at the Sylhet centre.",
+    "eor_policy": "Enquiry on Results (Remarking) fee is refunded if the score increases."
+  },
+  "score_conversion": {
+    "listening": {
+      "9.0": "39-40", "8.5": "37-38", "8.0": "35-36", "7.5": "32-34", "7.0": "30-31", "6.5": "26-29", "6.0": "23-25", "5.5": "18-22", "5.0": "16-17", "4.5": "13-15", "4.0": "10-12", "3.5": "7-9", "3.0": "5-6", "2.5": "4", "2.0": "3", "1.5": "2", "1.0": "1"
+    },
+    "reading_academic": {
+      "9.0": "39-40", "8.5": "37-38", "8.0": "35-36", "7.5": "33-34", "7.0": "30-32", "6.5": "27-29", "6.0": "23-26", "5.5": "19-22", "5.0": "15-18", "4.5": "13-14", "4.0": "10-12", "3.5": "8-9", "3.0": "6-7", "2.5": "4-5", "2.0": "3", "1.5": "2", "1.0": "1"
+    },
+    "reading_general_training": {
+      "9.0": "40", "8.5": "39", "8.0": "37-38", "7.5": "36", "7.0": "34-35", "6.5": "32-33", "6.0": "30-31", "5.5": "27-29", "5.0": "23-26", "4.5": "19-22", "4.0": "15-18", "3.5": "12-14", "3.0": "9-11", "2.5": "6-8", "2.0": "4-5", "1.5": "2-3", "1.0": "0-1"
+    }
+  },
+  "assessment_criteria": {
+    "writing_task_2": [
+      "Task Response (25%)", "Coherence & Cohesion (25%)", "Lexical Resource (25%)", "Grammatical Range & Accuracy (25%)"
+    ],
+    "speaking": [
+      "Fluency & Coherence", "Lexical Resource", "Grammatical Range", "Pronunciation"
+    ]
+  },
+  "test_day_rules": {
+    "permitted": ["Original Passport/NID", "HB Pencils", "Eraser", "Clear Water Bottle"],
+    "forbidden": ["Mobile Phones", "All Watches (Smart & Analog)", "Wallets", "Food", "Notes"],
+    "check_in": "Arrive 45 minutes before test time. Doors close strictly."
+  }
+}
