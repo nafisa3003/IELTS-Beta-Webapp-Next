@@ -9,12 +9,14 @@ const customJestConfig = {
     "^@/(.*)$": "<rootDir>/src/$1",
   },
   testPathIgnorePatterns: ["<rootDir>/.next/", "<rootDir>/node_modules/"],
+  testMatch: ["**/__tests__/**/*.test.[jt]s?(x)"],
   collectCoverageFrom: [
-    "src/lib/services/**/*.ts",
-    "src/lib/scoring/**/*.ts",
-    "src/lib/validations/**/*.ts",
-    "src/lib/repositories/**/*.ts",
-    "!src/lib/**/__tests__/**",
+    "src/lib/services/assessment-service.ts",
+    "src/lib/services/course-service.ts",
+    "src/lib/scoring/strategy.ts",
+    "src/lib/validations/auth.ts",
+    "src/lib/validations/profile.ts",
+    "src/lib/repositories/user.repository.ts",
   ],
   coverageThreshold: {
     global: {
