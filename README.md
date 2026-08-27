@@ -61,6 +61,14 @@ Five software design patterns are implemented in the application:
 
 ---
 
+## Testing
+ 
+Automated tests (Jest) cover the scoring, validation, repository, and service layers, with mocking/stubbing of external dependencies (the Supabase client, and repository-level dependencies) and 50%+ line/branch coverage on the tested backend logic.
+ 
+**Testing:** [`TESTING.md`](./TESTING.md)
+ 
+---
+
 ## Setup
 
 ```bash
