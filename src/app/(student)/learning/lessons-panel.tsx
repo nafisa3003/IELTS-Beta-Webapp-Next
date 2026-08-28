@@ -97,14 +97,38 @@ export async function LessonsPanel({ studentid }: { studentid: string }) {
                   <ul className="flex flex-col gap-2">
                     {contents.map((content) => {
                       const Icon = CONTENT_ICON[content.content_type];
+                      const href = content.youtube_link || content.file_url || null;
+                      const rowClasses =
+                        "flex items-center gap-3 rounded-md border border-mist px-4 py-3 text-sm text-ink transition-colors";
+
+                      if (!href) {
+                        return (
+                          <li
+                            key={content.contentid}
+                            className={`${rowClasses} opacity-60`}
+                            title="No link attached to this content yet"
+                          >
+                            <Icon size={18} className="shrink-0 text-teal" />
+                            <span className="flex-1">{content.title}</span>
+                            <span className="text-xs text-slate-soft">{content.content_type}</span>
+                          </li>
+                        );
+                      }
+
                       return (
-                        <li
-                          key={content.contentid}
-                          className="flex items-center gap-3 rounded-md border border-mist px-4 py-3 text-sm text-ink"
-                        >
-                          <Icon size={18} className="shrink-0 text-teal" />
-                          <span className="flex-1">{content.title}</span>
-                          <span className="text-xs text-slate-soft">{content.content_type}</span>
+                        <li key={content.contentid}>
+                          <a
+                            href={href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`${rowClasses} hover:border-teal hover:bg-mist/40`}
+                          >
+                            <Icon size={18} className="shrink-0 text-teal" />
+                            <span className="flex-1">{content.title}</span>
+                            <span className="text-xs text-slate-soft">
+                              {content.content_type === "YouTube" || content.content_type === "Video" ? "Watch" : "View"}
+                            </span>
+                          </a>
                         </li>
                       );
                     })}

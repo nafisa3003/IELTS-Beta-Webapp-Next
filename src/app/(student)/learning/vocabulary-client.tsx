@@ -262,7 +262,7 @@ export function VocabularyClient({
 
                       {/* Back */}
                       <div
-                        className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-lg bg-teal-deep px-8 text-center text-white [backface-visibility:hidden]"
+                        className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-lg bg-navy-deep px-8 text-center text-white [backface-visibility:hidden]"
                         style={{ transform: "rotateY(180deg)" }}
                       >
                         <p className="text-lg font-semibold">{activeWord.definition}</p>
@@ -408,7 +408,7 @@ export function VocabularyClient({
                     <p className="text-xs text-slate-soft">Click to flip</p>
                   </div>
                   <div
-                    className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-lg bg-teal-deep px-6 text-center text-white [backface-visibility:hidden]"
+                    className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-lg bg-navy-deep px-6 text-center text-white [backface-visibility:hidden]"
                     style={{ transform: "rotateY(180deg)" }}
                   >
                     <p className="text-base font-semibold">{livePreview.back}</p>
