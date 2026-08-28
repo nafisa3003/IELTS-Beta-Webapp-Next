@@ -24,9 +24,11 @@ async function action(
 export function PersonalInfoForm({
   profile,
   onboardingTargetBand,
+  onboardingCurrentBand,
 }: {
   profile: ProfileDetail;
   onboardingTargetBand?: number | null;
+  onboardingCurrentBand?: number | null;
 }) {
   const [state, formAction, pending] = useActionState<ActionResult, FormData>(
     action,
@@ -38,8 +40,21 @@ export function PersonalInfoForm({
     if (state?.error) notify.error(state.error);
   }, [state]);
 
+  // CRITICAL FIX: Use toFixed(1) so 1.0 becomes "1.0" not "1"
+  // This ensures the select defaultValue matches the option values exactly
   const defaultTarget =
-    onboardingTargetBand ?? profile.target_band ?? "";
+    profile.target_band != null
+      ? profile.target_band.toFixed(1)
+      : onboardingTargetBand != null
+      ? onboardingTargetBand.toFixed(1)
+      : "";
+
+  const defaultCurrent =
+    profile.current_band != null
+      ? profile.current_band.toFixed(1)
+      : onboardingCurrentBand != null
+      ? onboardingCurrentBand.toFixed(1)
+      : "";
 
   return (
     <form action={formAction} className="flex flex-col gap-4">
@@ -102,115 +117,105 @@ export function PersonalInfoForm({
       </div>
 
       {profile.role === "student" && (
-  <div className="grid gap-4 sm:grid-cols-2">
-    {/* Current band — styled dropdown */}
-    <div>
-      <label
-        htmlFor="currentBand"
-        className="block text-sm font-medium text-ink mb-1.5"
-      >
-        Current band score
-      </label>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {/* Current band */}
+          <div>
+            <label
+              htmlFor="currentBand"
+              className="block text-sm font-bold text-[var(--ink)] mb-1.5 dark:text-white"
+            >
+              Current band score
+            </label>
+            <div className="relative">
+              <select
+                id="currentBand"
+                name="currentBand"
+                defaultValue={defaultCurrent}
+                className="w-full h-12 px-4 pr-10 rounded-xl border-2 border-[var(--mist)] bg-white text-[var(--ink)] appearance-none focus:outline-none focus:ring-2 focus:ring-[var(--teal)]/20 focus:border-[var(--teal)] transition-all cursor-pointer dark:bg-navy-deep dark:border-slate/20 dark:text-white"
+              >
+                <option value="" disabled>
+                  Select your current band
+                </option>
+                {BAND_SCORES.map((score) => (
+                  <option key={score} value={score}>
+                    Band {score}
+                  </option>
+                ))}
+              </select>
+              <svg
+                className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--slate)]"
+                width="12"
+                height="8"
+                viewBox="0 0 12 8"
+                fill="none"
+              >
+                <path
+                  d="M1 1.5L6 6.5L11 1.5"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+          </div>
 
-      <div className="relative">
-        <select
-          id="currentBand"
-          name="currentBand"
-          defaultValue={
-            profile.current_band ? String(profile.current_band) : ""
-          }
-          className="w-full h-12 px-4 pr-10 rounded-xl border border-mist bg-white text-ink appearance-none focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all cursor-pointer"
-        >
-          <option value="" disabled>
-            Select your current band
-          </option>
-
-          {BAND_SCORES.map((score) => (
-            <option key={score} value={score}>
-              Band {score}
-            </option>
-          ))}
-        </select>
-
-        <svg
-          className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate"
-          width="12"
-          height="8"
-          viewBox="0 0 12 8"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M1 1.5L6 6.5L11 1.5"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </div>
-    </div>
-
-    {/* Target band — styled dropdown */}
-    <div>
-      <label
-        htmlFor="targetBand"
-        className="block text-sm font-medium text-ink mb-1.5"
-      >
-        Target band score
-      </label>
-
-      <div className="relative">
-        <select
-          id="targetBand"
-          name="targetBand"
-          defaultValue={defaultTarget ? String(defaultTarget) : ""}
-          className="w-full h-12 px-4 pr-10 rounded-xl border border-mist bg-white text-ink appearance-none focus:outline-none focus:ring-2 focus:ring-teal/20 focus:border-teal transition-all cursor-pointer"
-        >
-          <option value="" disabled>
-            Select your target band
-          </option>
-
-          {BAND_SCORES.map((score) => (
-            <option key={score} value={score}>
-              Band {score}
-            </option>
-          ))}
-        </select>
-
-        <svg
-          className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate"
-          width="12"
-          height="8"
-          viewBox="0 0 12 8"
-          fill="none"
-          aria-hidden="true"
-        >
-          <path
-            d="M1 1.5L6 6.5L11 1.5"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
-        </svg>
-      </div>
-    </div>
-  </div>
-)}
+          {/* Target band */}
+          <div>
+            <label
+              htmlFor="targetBand"
+              className="block text-sm font-bold text-[var(--ink)] mb-1.5 dark:text-white"
+            >
+              Target band score
+            </label>
+            <div className="relative">
+              <select
+                id="targetBand"
+                name="targetBand"
+                defaultValue={defaultTarget}
+                className="w-full h-12 px-4 pr-10 rounded-xl border-2 border-[var(--mist)] bg-white text-[var(--ink)] appearance-none focus:outline-none focus:ring-2 focus:ring-[var(--teal)]/20 focus:border-[var(--teal)] transition-all cursor-pointer dark:bg-navy-deep dark:border-slate/20 dark:text-white"
+              >
+                <option value="" disabled>
+                  Select your target band
+                </option>
+                {BAND_SCORES.map((score) => (
+                  <option key={score} value={score}>
+                    Band {score}
+                  </option>
+                ))}
+              </select>
+              <svg
+                className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[var(--slate)]"
+                width="12"
+                height="8"
+                viewBox="0 0 12 8"
+                fill="none"
+              >
+                <path
+                  d="M1 1.5L6 6.5L11 1.5"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+      )}
 
       {state?.error && (
-        <p className="text-xs text-danger">{state.error}</p>
+        <p className="text-xs text-[var(--danger)]">{state.error}</p>
       )}
 
       {state?.success && (
-        <p className="text-xs text-success">Profile updated.</p>
+        <p className="text-xs text-[var(--success)]">Profile updated.</p>
       )}
 
       <button
         type="submit"
         disabled={pending}
-        className="mt-2 w-fit rounded-pill bg-teal px-5 py-2 text-sm font-semibold text-white transition-opacity hover:opacity-90 disabled:opacity-50"
+        className="mt-2 w-fit rounded-full bg-[var(--teal)] px-6 py-2.5 text-sm font-bold text-white transition-all hover:bg-[var(--teal-deep)] hover:shadow-md disabled:opacity-50"
       >
         {pending ? "Saving..." : "Save changes"}
       </button>
