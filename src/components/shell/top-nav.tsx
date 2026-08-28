@@ -20,6 +20,7 @@ const STUDENT_NAV: NavItem[] = [
   { label: "AI Tutor", href: "/tutor" },
   { label: "Learning", href: "/learning" },
   { label: "Practice", href: "/practice" },
+  { label: "Live Classes", href: "/live-classes" }, 
   { label: "Rewards", href: "/rewards" },
   { label: "Announcements", href: "/announcements" },
   { label: "Support", href: "/support" },
@@ -39,6 +40,7 @@ const ADMIN_NAV: NavItem[] = [
   { label: "Courses", href: "/admin/courses" },
   { label: "Content", href: "/admin/content" },
   { label: "Practice Tests", href: "/admin/practice-tests" },
+  { label: "Live Classes", href: "/admin/live-classes" }, 
   { label: "Announcements", href: "/admin/announcements" },
   { label: "Support", href: "/admin/support" },
   { label: "Logs", href: "/admin/logs" },
@@ -71,7 +73,15 @@ function getInitials(name: string) {
     .slice(0, 2);
 }
 
-export function TopNav({ role, displayName }: { role: NavRole; displayName: string }) {
+export function TopNav({ 
+  role, 
+  displayName, 
+  avatarUrl 
+}: { 
+  role: NavRole; 
+  displayName: string;
+  avatarUrl?: string | null;
+}) {
   const pathname = usePathname();
   const scrolled = useScrolled();
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -151,8 +161,18 @@ export function TopNav({ role, displayName }: { role: NavRole; displayName: stri
                     : "hover:bg-mist/60 dark:hover:bg-white/5"
                 }`}
               >
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-navy text-xs font-bold text-white dark:bg-teal">
-                  {getInitials(displayName)}
+                <div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-navy text-xs font-bold text-white dark:bg-teal">
+                  {avatarUrl ? (
+                    <Image
+                      src={avatarUrl}
+                      alt={displayName}
+                      fill
+                      className="object-cover"
+                      unoptimized
+                    />
+                  ) : (
+                    getInitials(displayName)
+                  )}
                 </div>
                 <span className="hidden max-w-[120px] truncate text-sm font-medium text-ink dark:text-white lg:block">
                   {displayName}
@@ -176,13 +196,28 @@ export function TopNav({ role, displayName }: { role: NavRole; displayName: stri
 
               {userOpen && (
                 <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-xl border border-mist bg-white p-1.5 shadow-lg ring-1 ring-black/5 dark:border-slate/20 dark:bg-slate-900 dark:ring-white/10">
-                  <div className="px-3 py-2.5">
-                    <p className="text-sm font-semibold text-ink dark:text-white">
-                      Signed in as
-                    </p>
-                    <p className="mt-0.5 truncate text-xs text-slate dark:text-slate-soft">
-                      {displayName}
-                    </p>
+                  <div className="flex items-center gap-3 px-3 py-2.5">
+                    <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-navy text-xs font-bold text-white dark:bg-teal">
+                      {avatarUrl ? (
+                        <Image
+                          src={avatarUrl}
+                          alt={displayName}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                        />
+                      ) : (
+                        getInitials(displayName)
+                      )}
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-sm font-semibold text-ink dark:text-white truncate">
+                        {displayName}
+                      </p>
+                      <p className="text-xs text-slate dark:text-slate-soft truncate">
+                        Signed in
+                      </p>
+                    </div>
                   </div>
                   <div className="h-px bg-mist dark:bg-slate/20" />
                   <Link

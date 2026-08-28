@@ -1,6 +1,6 @@
 "use client"
 
-import { motion, useScroll, useTransform } from "framer-motion"
+import { motion } from "framer-motion"
 import { Check } from "lucide-react"
 import { useRef } from "react"
 import { TiltCard } from "@/components/ui/tilt-card"
@@ -16,7 +16,8 @@ const features = [
     tagText: "text-[#78FFF9]",
     tagBorder: "border-[var(--teal)]/30",
     checkColor: "text-[#78FFF9]",
-    gradient: "from-[var(--teal)] via-[#78FFF9] to-[var(--navy)]",
+    image: "/screenshots/band-progress.png",
+    alt: "Band progress dashboard showing 7.0 score and skills breakdown",
   },
   {
     tag: "All 4 skills",
@@ -28,19 +29,21 @@ const features = [
     tagText: "text-[var(--teal-deep)]",
     tagBorder: "border-[var(--teal)]/20",
     checkColor: "text-[var(--success)]",
-    gradient: "from-[var(--navy)] via-[var(--teal)] to-[#78FFF9]",
+    image: "/screenshots/practice.png",
+    alt: "Practice page with Listening, Reading, Writing, and Speaking modules",
   },
   {
     tag: "Vocabulary",
-    title: "Master 180+ academic words with flashcards",
+    title: "Master 220+ academic words with flashcards",
     desc: "3D interactive cards with difficulty levels, custom word creation, and spaced repetition. Build the vocabulary band 7+ answers demand.",
-    bg: "bg-[#F0FDFC]",
+    bg: "bg-[var(--white)]",
     text: "text-[#0F1720]",
     tagBg: "bg-[var(--teal)]/10",
     tagText: "text-[var(--teal-deep)]",
     tagBorder: "border-[var(--teal)]/20",
     checkColor: "text-[var(--success)]",
-    gradient: "from-[#78FFF9] via-white to-[var(--violet)]",
+    image: "/screenshots/vocabulary.png",
+    alt: "IELTS Word Bank with flashcards and difficulty filters",
   },
   {
     tag: "AI Powered",
@@ -52,19 +55,21 @@ const features = [
     tagText: "text-[#78FFF9]",
     tagBorder: "border-[var(--teal)]/30",
     checkColor: "text-[#78FFF9]",
-    gradient: "from-[var(--violet)] via-[var(--teal)] to-[#78FFF9]",
+    image: "/screenshots/ai-tutor.png",
+    alt: "AI Tutor chat interface with quick-action buttons",
   },
   {
     tag: "Official",
     title: "Cambridge resources, curated",
     desc: "Official practice tests, band descriptors, academic word lists, and model answers — all organized and downloadable in one place.",
-    bg: "bg-[var(--white)]",
-    text: "text-[#0F1720]",
-    tagBg: "bg-[var(--teal)]/10",
-    tagText: "text-[var(--teal-deep)]",
-    tagBorder: "border-[var(--teal)]/20",
-    checkColor: "text-[var(--success)]",
-    gradient: "from-[var(--navy)] to-[var(--teal)]",
+    bg: "bg-[var(--navy)]",
+    text: "text-white",
+    tagBg: "bg-[var(--teal)]/20",
+    tagText: "text-[#78FFF9]",
+    tagBorder: "border-[var(--teal)]/30",
+    checkColor: "text-[#78FFF9]",
+    image: "/screenshots/custom-cards.png",
+    alt: "Custom flashcard creation with definition and example sentence",
   },
   {
     tag: "Gamified",
@@ -76,11 +81,32 @@ const features = [
     tagText: "text-[var(--teal-deep)]",
     tagBorder: "border-[var(--teal)]/20",
     checkColor: "text-[var(--success)]",
-    gradient: "from-[var(--teal)] via-[#78FFF9] to-white",
+    image: "/screenshots/rewards.png",
+    alt: "Rewards page showing XP, streaks, achievements, and daily challenges",
   },
 ]
 
 const checkItems = ["Instant scoring", "Teacher feedback", "Progress tracking"]
+
+function BrowserFrame({ src, alt }: { src: string; alt: string }) {
+  return (
+    <div className="rounded-[var(--radius-lg)] border-2 border-[var(--mist)] bg-white shadow-[var(--shadow-card)] overflow-hidden">
+      <div className="flex items-center gap-1.5 px-4 py-3 border-b-2 border-[var(--mist)] bg-[var(--paper)]">
+        <div className="h-3 w-3 rounded-full bg-red-400" />
+        <div className="h-3 w-3 rounded-full bg-yellow-400" />
+        <div className="h-3 w-3 rounded-full bg-green-400" />
+        <div className="ml-4 flex-1 text-center">
+          <div className="inline-block px-3 py-1 rounded-md bg-white border border-[var(--mist)] text-xs text-[var(--slate)] font-medium">
+            ieltsbeta.app
+          </div>
+        </div>
+      </div>
+      <div className="p-2 bg-[var(--paper)]">
+        <img src={src} alt={alt} className="rounded-[var(--radius-sm)] w-full h-auto" />
+      </div>
+    </div>
+  )
+}
 
 export function FeatureShowcase() {
   const containerRef = useRef<HTMLElement>(null)
@@ -92,7 +118,7 @@ export function FeatureShowcase() {
   const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "20%"])
 
   return (
-    <section ref={containerRef} id="features" className="relative overflow-hidden">
+    <section id="features" className="relative overflow-hidden">
       <div className="space-y-0">
         {features.map((feature, i) => (
           <motion.div
@@ -104,7 +130,7 @@ export function FeatureShowcase() {
             className={`py-20 md:py-28 ${feature.bg}`}
           >
             <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-              <div className={`grid lg:grid-cols-2 gap-10 lg:gap-16 items-center ${i % 2 === 1 ? "" : ""}`}>
+              <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
                 <div className={i % 2 === 1 ? "lg:order-2" : ""}>
                   <div className={`inline-flex items-center gap-2 rounded-full border-2 ${feature.tagBorder} ${feature.tagBg} px-3 py-1 text-xs font-bold ${feature.tagText} uppercase tracking-wider mb-4`}>
                     {feature.tag}
@@ -126,9 +152,7 @@ export function FeatureShowcase() {
                 </div>
                 <div className={i % 2 === 1 ? "lg:order-1" : ""}>
                   <TiltCard tiltAmount={8} glowColor={feature.bg === "bg-[var(--navy)]" ? "rgba(120, 255, 249, 0.15)" : "rgba(14, 165, 153, 0.12)"}>
-                    <div className="rounded-[var(--radius-lg)] border-2 border-[var(--mist)] bg-[var(--paper)] p-3 shadow-[var(--shadow-card)]">
-                      <div className={`rounded-[var(--radius-md)] w-full aspect-[4/3] bg-gradient-to-br ${feature.gradient} opacity-90`} />
-                    </div>
+                    <BrowserFrame src={feature.image} alt={feature.alt} />
                   </TiltCard>
                 </div>
               </div>

@@ -17,7 +17,7 @@ export function ForTeachers() {
     <section id="for-teachers" className="py-20 md:py-28 bg-[#F5F3FF]">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
-          {/* Left: Visual */}
+          {/* Left: Real Teacher Portal screenshot */}
           <motion.div
             initial={{ opacity: 0, x: -40 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -25,12 +25,23 @@ export function ForTeachers() {
             transition={{ duration: 0.6 }}
             className="relative"
           >
-            <div className="rounded-[var(--radius-lg)] border-2 border-[var(--violet)]/20 bg-gradient-to-br from-[var(--violet)]/30 via-[var(--navy)]/10 to-[var(--teal)]/10 p-3 shadow-[var(--shadow-card)] aspect-[4/3] flex items-center justify-center">
-              <div className="text-center">
-                <div className="inline-flex h-20 w-20 items-center justify-center rounded-full bg-white/80 shadow-lg mb-4">
-                  <Users className="h-10 w-10 text-[var(--violet)]" />
+            <div className="rounded-[var(--radius-lg)] border-2 border-[var(--violet)]/20 bg-white shadow-[var(--shadow-card)] overflow-hidden">
+              <div className="flex items-center gap-1.5 px-4 py-3 border-b-2 border-[var(--mist)] bg-[var(--paper)]">
+                <div className="h-3 w-3 rounded-full bg-red-400" />
+                <div className="h-3 w-3 rounded-full bg-yellow-400" />
+                <div className="h-3 w-3 rounded-full bg-green-400" />
+                <div className="ml-4 flex-1 text-center">
+                  <div className="inline-block px-3 py-1 rounded-md bg-white border border-[var(--mist)] text-xs text-[var(--slate)] font-medium">
+                    ieltsbeta.app/teacher
+                  </div>
                 </div>
-                <p className="text-sm font-bold text-[var(--navy)]">Teacher Dashboard Preview</p>
+              </div>
+              <div className="p-2 bg-[var(--paper)]">
+                <img
+                  src="/screenshots/teacher-portal.png"
+                  alt="Teacher Portal showing total students, active courses, and class analytics"
+                  className="rounded-[var(--radius-sm)] w-full h-auto"
+                />
               </div>
             </div>
           </motion.div>

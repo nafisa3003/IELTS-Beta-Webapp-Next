@@ -13,7 +13,7 @@ const testimonials = [
     location: "Dhaka",
     initials: "NC",
     gradient: "from-[var(--navy)] to-[var(--teal)]",
-    image: "/avatar/Nawfat.jpeg",        
+    image: "/avatar/Nawfat.jpeg",
   },
   {
     quote: "The timed practice mode and real-time Band Score breakdowns felt exactly like taking the actual test. I hit my target score on my first attempt!",
@@ -129,14 +129,15 @@ export function SocialProof() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-6">
-            <AnimatePresence mode="sync">
+            <AnimatePresence mode="popLayout">
               {visible.map((t, i) => (
                 <motion.div
                   key={t.name}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -20 }}
-                  transition={{ duration: 0.3, delay: i * 0.1 }}
+                  layout
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.3, delay: i * 0.05 }}
                 >
                   <TiltCard tiltAmount={6} glowColor="rgba(14, 165, 153, 0.08)">
                     <div className="rounded-[var(--radius-lg)] border-2 border-[var(--mist)] bg-[var(--white)] p-6 flex flex-col hover:border-[var(--teal)]/20 transition-colors h-full">
@@ -150,12 +151,13 @@ export function SocialProof() {
                         "{t.quote}"
                       </p>
                       <div className="flex items-center gap-3 pt-4 border-t-2 border-[var(--mist)]">
-                        {/* PROFILE PICTURE */}
-                        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full ring-2 ring-[var(--mist)]">
+                        {/* REAL PROFILE PHOTO */}
+                        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full ring-2 ring-[var(--mist)] bg-gradient-to-br from-[var(--navy)] to-[var(--teal)]">
                           <img
                             src={t.image}
                             alt={t.name}
                             className="h-full w-full object-cover"
+                            loading="lazy"
                             onError={(e) => {
                               // Fallback to initials if image fails to load
                               const target = e.currentTarget
@@ -167,6 +169,8 @@ export function SocialProof() {
                               target.parentElement!.innerHTML = `<span class="text-white text-sm font-bold">${t.initials}</span>`
                             }}
                           />
+                          <div className="absolute inset-0 flex items-center justify-center text-white text-sm font-bold pointer-events-none">
+                          </div>
                         </div>
                         {/* /PROFILE PICTURE */}
 

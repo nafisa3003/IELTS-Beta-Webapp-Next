@@ -54,9 +54,10 @@ interface LandingNavProps {
   } | null
   displayName?: string
   role?: NavRole
+  avatarUrl?: string | null
 }
 
-export function LandingNav({ user, displayName = "", role = "student" }: LandingNavProps) {
+export function LandingNav({ user, displayName = "", role = "student", avatarUrl }: LandingNavProps) {
   const [scrolled, setScrolled] = useState(false)
   const [mobileOpen, setMobileOpen] = useState(false)
   const [userOpen, setUserOpen] = useState(false)
@@ -160,8 +161,18 @@ export function LandingNav({ user, displayName = "", role = "student" }: Landing
                         : "hover:bg-[var(--mist)]/60 dark:hover:bg-white/5"
                     }`}
                   >
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[var(--navy)] text-xs font-bold text-white dark:bg-[var(--teal)]">
-                      {getInitials(displayName)}
+                    <div className="relative flex h-8 w-8 items-center justify-center overflow-hidden rounded-full bg-[var(--navy)] text-xs font-bold text-white dark:bg-[var(--teal)]">
+                      {avatarUrl ? (
+                        <Image
+                          src={avatarUrl}
+                          alt={displayName}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                        />
+                      ) : (
+                        getInitials(displayName)
+                      )}
                     </div>
                     <span className="hidden max-w-[120px] truncate text-sm font-medium text-[var(--ink)] dark:text-white lg:block">
                       {displayName}
@@ -180,11 +191,28 @@ export function LandingNav({ user, displayName = "", role = "student" }: Landing
 
                   {userOpen && (
                     <div className="absolute right-0 mt-2 w-56 origin-top-right rounded-xl border border-[var(--mist)] bg-white p-1.5 shadow-lg ring-1 ring-black/5 dark:border-slate/20 dark:bg-slate-900 dark:ring-white/10">
-                      <div className="px-3 py-2.5">
-                        <p className="text-sm font-semibold text-[var(--ink)] dark:text-white">Signed in as</p>
-                        <p className="mt-0.5 truncate text-xs text-[var(--slate)] dark:text-slate-soft">
-                          {displayName}
-                        </p>
+                      <div className="flex items-center gap-3 px-3 py-2.5">
+                        <div className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[var(--navy)] text-xs font-bold text-white dark:bg-[var(--teal)]">
+                          {avatarUrl ? (
+                            <Image
+                              src={avatarUrl}
+                              alt={displayName}
+                              fill
+                              className="object-cover"
+                              unoptimized
+                            />
+                          ) : (
+                            getInitials(displayName)
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-sm font-semibold text-[var(--ink)] dark:text-white truncate">
+                            {displayName}
+                          </p>
+                          <p className="text-xs text-[var(--slate)] dark:text-slate-soft truncate">
+                            Signed in
+                          </p>
+                        </div>
                       </div>
                       <div className="h-px bg-[var(--mist)] dark:bg-slate/20" />
                       <Link
@@ -254,6 +282,25 @@ export function LandingNav({ user, displayName = "", role = "student" }: Landing
             <nav className="flex flex-col gap-4">
               {isLoggedIn ? (
                 <>
+                  <div className="flex items-center gap-3 pb-4 border-b-2 border-[var(--mist)]">
+                    <div className="relative flex h-12 w-12 items-center justify-center overflow-hidden rounded-full bg-[var(--navy)] text-sm font-bold text-white">
+                      {avatarUrl ? (
+                        <Image
+                          src={avatarUrl}
+                          alt={displayName}
+                          fill
+                          className="object-cover"
+                          unoptimized
+                        />
+                      ) : (
+                        getInitials(displayName)
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-base font-bold text-[var(--navy)]">{displayName}</p>
+                      <p className="text-xs text-[var(--slate)]">Signed in</p>
+                    </div>
+                  </div>
                   <Link
                     href="/"
                     onClick={() => setMobileOpen(false)}

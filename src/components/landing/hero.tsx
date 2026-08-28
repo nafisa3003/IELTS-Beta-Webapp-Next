@@ -1,7 +1,7 @@
 "use client"
 
 import { motion, useScroll, useTransform } from "framer-motion"
-import { ArrowRight, Play, TrendingUp, Target, BookOpen } from "lucide-react"
+import { ArrowRight, Play, TrendingUp, Target } from "lucide-react"
 import Link from "next/link"
 import { useRef } from "react"
 
@@ -88,7 +88,7 @@ export function Hero() {
             </motion.div>
           </motion.div>
 
-          {/* Right: Product placeholder with 3D tilt */}
+          {/* Right: Real dashboard screenshot */}
           <motion.div
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
@@ -100,9 +100,28 @@ export function Hero() {
               whileHover={{ rotateY: 5, rotateX: -5, scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300, damping: 30 }}
               style={{ transformStyle: "preserve-3d" }}
-              className="relative rounded-[var(--radius-lg)] border-2 border-[var(--mist)] bg-white p-3 shadow-[var(--shadow-float)]"
+              className="relative"
             >
-              <div className="rounded-[var(--radius-md)] w-full aspect-[4/3] bg-gradient-to-br from-[var(--navy)] via-[var(--teal)] to-[#78FFF9] opacity-90" />
+              {/* Browser Chrome Frame */}
+              <div className="rounded-[var(--radius-lg)] border-2 border-[var(--mist)] bg-white shadow-[var(--shadow-float)] overflow-hidden">
+                <div className="flex items-center gap-1.5 px-4 py-3 border-b-2 border-[var(--mist)] bg-[var(--paper)]">
+                  <div className="h-3 w-3 rounded-full bg-red-400" />
+                  <div className="h-3 w-3 rounded-full bg-yellow-400" />
+                  <div className="h-3 w-3 rounded-full bg-green-400" />
+                  <div className="ml-4 flex-1 text-center">
+                    <div className="inline-block px-3 py-1 rounded-md bg-white border border-[var(--mist)] text-xs text-[var(--slate)] font-medium">
+                      ieltsbeta.app/dashboard
+                    </div>
+                  </div>
+                </div>
+                <div className="p-2 bg-[var(--paper)]">
+                  <img
+                    src="/screenshots/dashboard.png"
+                    alt="IELTS Beta Dashboard showing band progress, streaks, and daily goals"
+                    className="rounded-[var(--radius-sm)] w-full h-auto"
+                  />
+                </div>
+              </div>
             </motion.div>
 
             {/* Floating streak card */}
