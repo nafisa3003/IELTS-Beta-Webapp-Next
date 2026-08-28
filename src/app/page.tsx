@@ -21,16 +21,25 @@ export default async function LandingPage() {
 
   let displayName = ""
   let role: NavRole = "student"
+  let avatarUrl: string | null = null
 
   if (user) {
     const { data } = await supabase
       .from("users")
-      .select("personid, role, persons(first_name, last_name)")
+      .select("personid, role, persons(first_name, last_name, avatar_url)")
       .eq("userid", user.id)
       .single()
 
-    const person = (data as unknown as { persons: { first_name: string; last_name: string } | null })?.persons
+    const person = (data as unknown as { 
+      persons: { 
+        first_name: string; 
+        last_name: string; 
+        avatar_url: string | null 
+      } | null 
+    })?.persons
+
     displayName = person ? `${person.first_name} ${person.last_name}` : user.email ?? ""
+    avatarUrl = person?.avatar_url ?? null
 
     const userRole = (data as unknown as { role: string | null })?.role
     if (userRole === "teacher" || userRole === "admin") {
@@ -40,7 +49,7 @@ export default async function LandingPage() {
 
   return (
     <main className="min-h-screen">
-      <LandingNav user={user} displayName={displayName} role={role} />
+      <LandingNav user={user} displayName={displayName} role={role} avatarUrl={avatarUrl} />
       <Hero />
       <TrustBar />
       <HowItWorks />
