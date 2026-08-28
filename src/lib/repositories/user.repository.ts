@@ -28,32 +28,43 @@ export class UserRepository {
         role: UserRow["role"];
         created_at: string;
         persons: { first_name: string; last_name: string } | null;
-        students: { display_id: string | null }[] | null;
-        teachers: { display_id: string | null }[] | null;
-        admins: { display_id: string | null }[] | null;
+        students: { display_id: string | null } | { display_id: string | null }[] | null;
+        teachers: { display_id: string | null } | { display_id: string | null }[] | null;
+        admins: { display_id: string | null } | { display_id: string | null }[] | null;
       };
+
+      const pickDisplayId = (
+        v: { display_id: string | null } | { display_id: string | null }[] | null
+      ): string | null => {
+        if (!v) return null;
+        if (Array.isArray(v)) return v[0]?.display_id ?? null;
+        return v.display_id ?? null;
+      };
+
       return {
         userid: r.userid,
         email: r.email,
         role: r.role,
         created_at: r.created_at,
         persons: r.persons,
-        display_id: r.students?.[0]?.display_id ?? r.teachers?.[0]?.display_id ?? r.admins?.[0]?.display_id ?? null,
+        display_id: pickDisplayId(r.students) ?? pickDisplayId(r.teachers) ?? pickDisplayId(r.admins),
       };
     });
   }
 
-  /** Changing a role isn't just a label flip — the target role-subtype
-   * row (students/teachers/admins) has to actually exist, or every real
-   * feature for that role finds nothing behind the account. Upsert
-   * handles both a first-time promotion and re-promoting someone who's
-   * held that role before. */
-  async updateRole(userid: string, role: UserRow["role"]): Promise<void> {
+  async updateRole(userid: string, role: UserRow["role"], actingAdminId: string): Promise<void> {
     const { error } = await this.db.from("users").update({ role }).eq("userid", userid);
     if (error) throw error;
 
     const table = role === "student" ? "students" : role === "teacher" ? "teachers" : "admins";
     const { error: subtypeError } = await this.db.from(table).upsert({ userid }, { onConflict: "userid" });
     if (subtypeError) throw subtypeError;
+
+    const { error: logError } = await this.db.from("admin_logs").insert({
+      adminid: actingAdminId,
+      action: "role_changed",
+      details: { userid, new_role: role },
+    });
+    if (logError) throw logError;
   }
 }

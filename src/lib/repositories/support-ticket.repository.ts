@@ -51,5 +51,12 @@ export class SupportTicketRepository {
       .update({ status, adminid })
       .eq("ticketid", ticketid);
     if (error) throw error;
+
+    const { error: logError } = await this.db.from("admin_logs").insert({
+      adminid,
+      action: "support_ticket_status_updated",
+      details: { ticketid, new_status: status },
+    });
+    if (logError) throw logError;
   }
 }
