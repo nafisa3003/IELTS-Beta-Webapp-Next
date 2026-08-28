@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { CourseService } from "@/lib/services/course-service";
 import { ContentRepository } from "@/lib/repositories/content.repository";
@@ -39,7 +40,10 @@ export default async function TeacherCoursesPage() {
         <StaggerGroup className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {stats.map(({ course, lessonCount, studentCount }) => (
             <StaggerItem key={course.courseid}>
-              <div className="flex h-full flex-col gap-3 rounded-lg border border-mist bg-surface p-5 shadow-card transition-transform hover:-translate-y-0.5">
+              <Link
+                href={`/teacher/courses/${course.courseid}`}
+                className="flex h-full flex-col gap-3 rounded-lg border border-mist bg-surface p-5 shadow-card transition-transform hover:-translate-y-0.5"
+              >
                 <div>
                   <p className="text-sm font-semibold text-ink">{course.title}</p>
                   <p className="mt-1 text-xs text-slate-soft">
@@ -55,7 +59,7 @@ export default async function TeacherCoursesPage() {
                     {studentCount === 1 ? "" : "s"}
                   </span>
                 </div>
-              </div>
+              </Link>
             </StaggerItem>
           ))}
         </StaggerGroup>
