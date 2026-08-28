@@ -105,12 +105,18 @@ export class ProfileRepository {
       >
     >
   ): Promise<void> {
-    const { error } = await this.db
+    const { data, error } = await this.db
       .from("persons")
       .update(fields)
-      .eq("personid", personid);
+      .eq("personid", personid)
+      .select();
 
     if (error) throw error;
+    if (!data || data.length === 0) {
+      throw new Error(
+        "updatePerson matched no rows — check RLS UPDATE policy on persons"
+      );
+    }
   }
 
   async updateTargetBand(
