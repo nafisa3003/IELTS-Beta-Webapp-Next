@@ -14,31 +14,33 @@ export default async function ProfilePage() {
   if (!user) return null;
 
   const repo = new ProfileRepository(supabase);
+
   const [profile, settings, onboarding] = await Promise.all([
     repo.findByUserId(user.id),
     repo.findSettings(user.id),
-    getOnboardingForProfile(), // ← fetch onboarding data
+    getOnboardingForProfile(),
   ]);
 
   if (!profile) return <p className="text-sm text-slate">Profile not found.</p>;
 
   const initials = `${profile.first_name[0] ?? ""}${profile.last_name[0] ?? ""}`.toUpperCase();
 
-  // If profile doesn't have target_band yet, fall back to onboarding target_band
+  // Merge onboarding data as fallback
   const effectiveTargetBand = profile.target_band ?? onboarding?.target_band ?? null;
+  const effectiveCurrentBand = profile.current_band ?? onboarding?.current_band ?? null;
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="rounded-lg bg-surface p-6 shadow-card">
+      <div className="rounded-2xl border-2 border-[var(--mist)] bg-white p-6 shadow-[var(--shadow-card)] dark:border-slate/20 dark:bg-navy-deep">
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <AvatarUploader currentUrl={profile.avatar_url} initials={initials} />
           <div className="text-left sm:text-right">
-            <p className="font-display text-lg font-semibold text-ink">
+            <p className="font-display text-lg font-bold text-[var(--ink)] dark:text-white">
               {profile.first_name} {profile.last_name}
             </p>
-            <p className="text-xs uppercase tracking-wide text-slate-soft">{profile.role}</p>
+            <p className="text-xs uppercase tracking-wide text-[var(--slate-soft)]">{profile.role}</p>
             {profile.display_id && (
-              <p className="mt-0.5 font-mono text-xs font-semibold text-teal">{profile.display_id}</p>
+              <p className="mt-0.5 font-mono text-xs font-bold text-[var(--teal)]">{profile.display_id}</p>
             )}
           </div>
         </div>
@@ -48,16 +50,17 @@ export default async function ProfilePage() {
             <PersonalInfoForm
               profile={profile}
               onboardingTargetBand={effectiveTargetBand}
+              onboardingCurrentBand={effectiveCurrentBand}
             />
           }
           settings={
             <div className="flex flex-col gap-6">
               <SettingsForm settings={settings} />
-              <div className="border-t border-mist pt-6">
-                <h3 className="mb-3 text-sm font-semibold text-ink">Change password</h3>
+              <div className="border-t border-[var(--mist)] pt-6">
+                <h3 className="mb-3 text-sm font-bold text-[var(--ink)] dark:text-white">Change password</h3>
                 <ChangePasswordForm />
               </div>
-              <div className="border-t border-mist pt-6">
+              <div className="border-t border-[var(--mist)] pt-6">
                 <DeleteAccountSection />
               </div>
             </div>

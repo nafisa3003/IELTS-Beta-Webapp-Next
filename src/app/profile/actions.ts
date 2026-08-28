@@ -51,6 +51,7 @@ export async function updateProfileInfoAction(formData: FormData) {
     return { error: "Profile not found" };
   }
 
+  // Update persons table
   await repo.updatePerson(profile.personid, {
     first_name: values.firstName,
     last_name: values.lastName,
@@ -60,10 +61,8 @@ export async function updateProfileInfoAction(formData: FormData) {
     dob: values.dob || null,
   });
 
-  if (
-    profile.role === "student" &&
-    (values.targetBand || values.currentBand)
-  ) {
+  // Update band scores in students table
+  if (profile.role === "student") {
     const { data: student } = await supabase
       .from("students")
       .select("studentid")
@@ -71,17 +70,21 @@ export async function updateProfileInfoAction(formData: FormData) {
       .maybeSingle();
 
     if (student) {
-      if (values.targetBand) {
+      // Use nullish coalescing to allow "0" and "0.0" as valid values
+      const targetVal = values.targetBand?.trim();
+      const currentVal = values.currentBand?.trim();
+
+      if (targetVal !== undefined && targetVal !== "") {
         await repo.updateTargetBand(
           student.studentid as string,
-          Number(values.targetBand)
+          Number(targetVal)
         );
       }
 
-      if (values.currentBand) {
+      if (currentVal !== undefined && currentVal !== "") {
         await repo.updateCurrentBand(
           student.studentid as string,
-          Number(values.currentBand)
+          Number(currentVal)
         );
       }
     }
@@ -113,6 +116,7 @@ export async function uploadAvatarAction(formData: FormData) {
   const ext = file.name.split(".").pop() ?? "jpg";
   const path = `${user.id}/avatar.${ext}`;
 
+  // Upload to Supabase Storage
   const { error: uploadError } = await supabase.storage
     .from("avatars")
     .upload(path, file, {
@@ -121,26 +125,47 @@ export async function uploadAvatarAction(formData: FormData) {
     });
 
   if (uploadError) {
-    return { error: uploadError.message };
+    console.error("[Avatar] Storage upload failed:", uploadError);
+    return { error: `Storage upload failed: ${uploadError.message}` };
   }
 
-  const {
-    data: { publicUrl },
-  } = supabase.storage.from("avatars").getPublicUrl(path);
+  // Get public URL
+  const { data: urlData } = supabase.storage.from("avatars").getPublicUrl(path);
+  const publicUrl = urlData?.publicUrl;
 
+  if (!publicUrl) {
+    return { error: "Could not generate public URL for avatar" };
+  }
+
+  const avatarUrl = `${publicUrl}?v=${Date.now()}`;
+
+  // Save to persons table
   const repo = new ProfileRepository(supabase);
   const profile = await repo.findByUserId(user.id);
 
   if (!profile) {
     return { error: "Profile not found" };
   }
-  await repo.updatePerson(profile.personid, {
-    avatar_url: `${publicUrl}?v=${Date.now()}`,
-  });
+
+  try {
+    await repo.updatePerson(profile.personid, { avatar_url: avatarUrl });
+  } catch (err: any) {
+    console.error("[Avatar] DB update failed:", err);
+    // Fallback: try raw Supabase update
+    const { error: rawError } = await supabase
+      .from("persons")
+      .update({ avatar_url: avatarUrl })
+      .eq("personid", profile.personid);
+
+    if (rawError) {
+      return { error: `Database save failed: ${rawError.message}` };
+    }
+  }
 
   revalidatePath("/profile");
+  revalidatePath("/");
 
-  return { success: true };
+  return { success: true, avatarUrl };
 }
 
 export async function updateSettingsAction(formData: FormData) {
