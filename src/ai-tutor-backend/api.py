@@ -37,7 +37,7 @@ class ChatResponse(BaseModel):
 @app.get("/health")
 def health():
     """Health check — PHP chatbot.php polls this to show online/offline status."""
-    return {"status": "ok", "engine": "IELTSGraphEngine", "model": "llama-3.1-70b-versatile"}
+    return {"status": "ok", "engine": "IELTSGraphEngine", "model": "llama-3.3-70b-versatile"}
 
 
 @app.post("/chat", response_model=ChatResponse)

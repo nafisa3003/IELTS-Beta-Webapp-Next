@@ -103,7 +103,11 @@ class IELTSGraphEngine:
     # ---- Multi-key rotation ----
     def _build_llm(self):
         key = self._groq_keys[self._key_index]
-        self.llm = ChatGroq(api_key=key, model="llama-3.1-70b-versatile")
+        # llama-3.3-70b-versatile was deprecated by Groq (June 2026). Using
+        # openai/gpt-oss-120b, their recommended replacement — kept as an env
+        # var so a future deprecation is a .env edit, not a code change.
+        model = os.getenv("GROQ_MODEL", "openai/gpt-oss-120b")
+        self.llm = ChatGroq(api_key=key, model=model)
         self.llm_with_tools = self.llm.bind_tools(self.tools)
 
     def _rotate_key(self):

@@ -34,3 +34,4 @@ Thumbs.db
 # editor
 .vscode/*
 !.vscode/settings.json
+src/ai-tutor-backend/venv/bin/python
