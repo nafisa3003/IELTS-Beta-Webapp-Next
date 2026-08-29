@@ -6,6 +6,7 @@ import { PracticeTestRepository } from "@/lib/repositories/practice-test.reposit
 import { QuestionRepository } from "@/lib/repositories/question.repository";
 import { AnswerOptionRepository } from "@/lib/repositories/answer-option.repository";
 import type { Skill, TestCategory } from "@/types/assessment";
+import { PassageRepository } from "@/lib/repositories/passage.repository";
 
 type ActionResult = { error?: string; success?: boolean } | null;
 const REVALIDATE = "/admin/practice-tests";
@@ -18,6 +19,7 @@ export async function createTestAction(_prev: ActionResult, formData: FormData):
   const category = String(formData.get("category") ?? "") as TestCategory;
   const duration = Number(formData.get("duration"));
   const totalMarks = Number(formData.get("total_marks"));
+  const audioUrl = String(formData.get("audio_url") ?? "") || null;
 
   if (!courseid || !title || !category || !duration || !totalMarks) {
     return { error: "Fill in every field" };
@@ -25,7 +27,10 @@ export async function createTestAction(_prev: ActionResult, formData: FormData):
 
   const supabase = await createClient();
   try {
-    await new PracticeTestRepository(supabase).create({ courseid, title, category, duration, total_marks: totalMarks });
+    await new PracticeTestRepository(supabase).create({
+      courseid, title, category, duration, total_marks: totalMarks,
+      audio_url: null
+    });
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Couldn't create test" };
   }
@@ -72,12 +77,13 @@ export async function createQuestionAction(_prev: ActionResult, formData: FormDa
   const question = String(formData.get("question") ?? "").trim();
   const skill = String(formData.get("skill") ?? "") as Skill;
   const marks = Number(formData.get("marks")) || 1;
+  const passageid = String(formData.get("passageid") ?? "") || null;
 
   if (!testid || !question || !skill) return { error: "Fill in every field" };
 
   const supabase = await createClient();
   try {
-    await new QuestionRepository(supabase).create({ testid, question, skill, marks });
+    await new QuestionRepository(supabase).create({ testid, question, skill, marks, passageid });
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Couldn't add question" };
   }
@@ -90,12 +96,13 @@ export async function updateQuestionAction(_prev: ActionResult, formData: FormDa
   const question = String(formData.get("question") ?? "").trim();
   const skill = String(formData.get("skill") ?? "") as Skill;
   const marks = Number(formData.get("marks")) || 1;
+  const passageid = String(formData.get("passageid") ?? "") || null;
 
   if (!questionid || !question || !skill) return { error: "Fill in every field" };
 
   const supabase = await createClient();
   try {
-    await new QuestionRepository(supabase).update(questionid, { question, skill, marks });
+    await new QuestionRepository(supabase).update(questionid, { question, skill, marks, passageid });
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Couldn't update question" };
   }
@@ -109,6 +116,55 @@ export async function deleteQuestionAction(questionid: string): Promise<ActionRe
     await new QuestionRepository(supabase).delete(questionid);
   } catch (e) {
     return { error: e instanceof Error ? e.message : "Couldn't delete question" };
+  }
+  revalidatePath(REVALIDATE);
+  return { success: true };
+}
+
+// ---------- Passages ----------
+
+export async function createPassageAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+  const testid = String(formData.get("testid") ?? "");
+  const title = String(formData.get("title") ?? "").trim();
+  const passageText = String(formData.get("passage_text") ?? "").trim();
+  const orderIndex = Number(formData.get("order_index")) || 1;
+
+  if (!testid || !title || !passageText) return { error: "Fill in title and passage text" };
+
+  const supabase = await createClient();
+  try {
+    await new PassageRepository(supabase).create({ testid, title, passage_text: passageText, order_index: orderIndex });
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Couldn't add passage" };
+  }
+  revalidatePath(REVALIDATE);
+  return { success: true };
+}
+
+export async function updatePassageAction(_prev: ActionResult, formData: FormData): Promise<ActionResult> {
+  const passageid = String(formData.get("passageid") ?? "");
+  const title = String(formData.get("title") ?? "").trim();
+  const passageText = String(formData.get("passage_text") ?? "").trim();
+  const orderIndex = Number(formData.get("order_index")) || 1;
+
+  if (!passageid || !title || !passageText) return { error: "Fill in title and passage text" };
+
+  const supabase = await createClient();
+  try {
+    await new PassageRepository(supabase).update(passageid, { title, passage_text: passageText, order_index: orderIndex });
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Couldn't update passage" };
+  }
+  revalidatePath(REVALIDATE);
+  return { success: true };
+}
+
+export async function deletePassageAction(passageid: string): Promise<ActionResult> {
+  const supabase = await createClient();
+  try {
+    await new PassageRepository(supabase).delete(passageid);
+  } catch (e) {
+    return { error: e instanceof Error ? e.message : "Couldn't delete passage" };
   }
   revalidatePath(REVALIDATE);
   return { success: true };
