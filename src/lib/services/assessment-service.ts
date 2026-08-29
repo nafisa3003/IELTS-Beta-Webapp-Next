@@ -4,12 +4,15 @@ import { QuestionRepository } from "@/lib/repositories/question.repository";
 import { AnswerOptionRepository } from "@/lib/repositories/answer-option.repository";
 import { TestAttemptRepository } from "@/lib/repositories/test-attempt.repository";
 import { TestResultRepository } from "@/lib/repositories/test-result.repository";
+import { PassageRepository } from "@/lib/repositories/passage.repository";
+import { WrittenResponseRepository } from "@/lib/repositories/written-response.repository";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { strategyFor } from "@/lib/scoring/strategy";
-import type { Question, SubmittedAnswers, Skill } from "@/types/assessment";
+import type { Question, SubmittedAnswers, Skill, Passage } from "@/types/assessment";
 
 export interface TestWithQuestions {
   test: NonNullable<Awaited<ReturnType<PracticeTestRepository["findById"]>>>;
+  passages: Passage[];
   questionsBySkill: Partial<Record<Skill, { question: Question; options: { optionid: string; option_text: string }[] }[]>>;
 }
 
@@ -19,6 +22,8 @@ export class AssessmentService {
   private answerOptions: AnswerOptionRepository;
   private attempts: TestAttemptRepository;
   private results: TestResultRepository;
+  private passages: PassageRepository;
+  private writtenResponses: WrittenResponseRepository;
 
   constructor(private readonly db: SupabaseClient) {
     this.tests = new PracticeTestRepository(db);
@@ -26,6 +31,8 @@ export class AssessmentService {
     this.answerOptions = new AnswerOptionRepository(db);
     this.attempts = new TestAttemptRepository(db);
     this.results = new TestResultRepository(db);
+    this.passages = new PassageRepository(db);
+    this.writtenResponses = new WrittenResponseRepository(db);
   }
 
   async listTestsForCourse(courseid: string) {
@@ -47,12 +54,20 @@ export class AssessmentService {
     return Array.from(seen.values());
   }
 
-  /** Renders a test to a student — options never include is_correct. */
+  /**
+   * Renders a test to a student — options never include is_correct.
+   * Also returns any reading passages attached to this test, ordered
+   * for display, so the UI can render passage + questions side-by-side.
+   */
   async getTestForTaking(testid: string): Promise<TestWithQuestions | null> {
     const test = await this.tests.findById(testid);
     if (!test) return null;
 
-    const questions = await this.questions.findByTest(testid);
+    const [questions, passages] = await Promise.all([
+      this.questions.findByTest(testid),
+      this.passages.findByTest(testid),
+    ]);
+
     const questionsBySkill: TestWithQuestions["questionsBySkill"] = {};
 
     for (const q of questions) {
@@ -61,7 +76,7 @@ export class AssessmentService {
       questionsBySkill[q.skill]!.push({ question: q, options });
     }
 
-    return { test, questionsBySkill };
+    return { test, passages, questionsBySkill };
   }
 
   async startAttempt(studentid: string, testid: string) {
@@ -75,11 +90,16 @@ export class AssessmentService {
    * Observer trigger in the DB (0007_observer.sql) — XP + admin log.
    * Must use the admin client because is_correct is invisible to the
    * student's own RLS session.
+   *
+   * Writing/Speaking answers are free text and never auto-scored — they're
+   * persisted to written_responses so a teacher has something to grade
+   * against the rubric, and their skill score is left with a null band.
    */
   async submitAttempt(attemptid: string, testid: string, answers: SubmittedAnswers) {
     const adminDb = createAdminClient();
     const adminQuestions = new QuestionRepository(adminDb);
     const adminAnswerOptions = new AnswerOptionRepository(adminDb);
+    const adminWrittenResponses = new WrittenResponseRepository(adminDb);
 
     const questions = await adminQuestions.findByTest(testid);
     const options = await adminAnswerOptions.findAllByTest(testid);
@@ -112,10 +132,22 @@ export class AssessmentService {
     }
     await this.results.create(attemptid, bandBySkill, overallBand);
 
+    // Persist free-text Writing/Speaking answers for teacher grading.
+    const subjectiveEntries = questions
+      .filter((q) => q.skill === "Writing" || q.skill === "Speaking")
+      .map((q) => ({ questionid: q.questionid, answer_text: answers[q.questionid] ?? "" }))
+      .filter((e) => e.answer_text.trim().length > 0);
+    await adminWrittenResponses.upsertMany(attemptid, subjectiveEntries);
+
     return { attempt, skillScores, totalRaw, totalMax };
   }
 
   async getResult(attemptid: string) {
     return this.results.findByAttempt(attemptid);
+  }
+
+  /** For a teacher/admin grading view: what the student actually wrote. */
+  async getWrittenResponses(attemptid: string) {
+    return this.writtenResponses.findByAttempt(attemptid);
   }
 }

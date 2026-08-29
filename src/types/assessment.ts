@@ -4,6 +4,7 @@ export type TestCategory = "Academic" | "General";
 export interface PracticeTest {
   testid: string;
   courseid: string;
+  audio_url: string | null;
   title: string;
   category: TestCategory;
   duration: number;
@@ -13,6 +14,7 @@ export interface PracticeTest {
 export interface Question {
   questionid: string;
   testid: string;
+  passageid: string | null;
   question: string;
   skill: Skill;
   marks: number;
@@ -51,3 +53,18 @@ export interface TestResult {
 
 /** studentid -> chosen optionid, keyed by questionid */
 export type SubmittedAnswers = Record<string, string>;
+
+export interface Passage {
+  passageid: string;
+  testid: string;
+  title: string;
+  passage_text: string;
+  order_index: number;
+}
+
+export interface WrittenResponse {
+  responseid: string;
+  attemptid: string;
+  questionid: string;
+  answer_text: string;
+}
