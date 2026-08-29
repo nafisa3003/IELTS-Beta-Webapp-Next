@@ -10,13 +10,13 @@ export class QuestionRepository {
     return data as Question[];
   }
 
-  async create(input: Pick<Question, "testid" | "question" | "skill" | "marks">): Promise<Question> {
+  async create(input: Pick<Question, "testid" | "question" | "skill" | "marks" | "passageid">): Promise<Question> {
     const { data, error } = await this.db.from("questions").insert(input).select().single();
     if (error) throw error;
     return data as Question;
   }
 
-  async update(questionid: string, input: Partial<Pick<Question, "question" | "skill" | "marks">>): Promise<Question> {
+  async update(questionid: string, input: Partial<Pick<Question, "question" | "skill" | "marks" | "passageid">>): Promise<Question> {
     const { data, error } = await this.db.from("questions").update(input).eq("questionid", questionid).select().single();
     if (error) throw error;
     return data as Question;

@@ -24,7 +24,7 @@ export class PracticeTestRepository {
   }
 
   async create(
-    input: Pick<PracticeTest, "courseid" | "title" | "category" | "duration" | "total_marks">
+    input: Pick<PracticeTest, "courseid" | "title" | "category" | "duration" | "total_marks" | "audio_url">
   ): Promise<PracticeTest> {
     const { data, error } = await this.db.from("practice_tests").insert(input).select().single();
     if (error) throw error;
@@ -32,8 +32,8 @@ export class PracticeTestRepository {
   }
 
   async update(
-    testid: string,
-    input: Partial<Pick<PracticeTest, "title" | "category" | "duration" | "total_marks">>
+    testid: string, 
+    input: Partial<Pick<PracticeTest, "title" | "category" | "duration" | "total_marks" | "audio_url">>
   ): Promise<PracticeTest> {
     const { data, error } = await this.db.from("practice_tests").update(input).eq("testid", testid).select().single();
     if (error) throw error;
