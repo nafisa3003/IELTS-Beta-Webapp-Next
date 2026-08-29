@@ -5,6 +5,7 @@ import { notify } from "@/lib/toast";
 import { updateTestAction, deleteTestAction, createQuestionAction } from "./actions";
 import { QuestionRow } from "./question-row";
 import { PassageRow, CreatePassageForm } from "./passage-row";
+import { createClient } from "@/lib/supabase/client";
 import type { PracticeTest, Question, AnswerOption, Passage } from "@/types/assessment";
 
 type ActionResult = { error?: string; success?: boolean } | null;
@@ -70,6 +71,8 @@ export function TestSection({
 
 function EditTestForm({ test, onDone }: { test: PracticeTest; onDone: () => void }) {
   const [state, formAction, pending] = useActionState<ActionResult, FormData>(updateTestAction, null);
+  const [audioUrl, setAudioUrl] = useState(test.audio_url ?? "");
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     if (state?.success) {
@@ -80,9 +83,31 @@ function EditTestForm({ test, onDone }: { test: PracticeTest; onDone: () => void
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [state]);
 
+  async function handleAudioSelect(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    const supabase = createClient();
+    const path = `${Date.now()}-${file.name}`;
+    const { error } = await supabase.storage.from("listening-audio").upload(path, file);
+    setUploading(false);
+    if (error) {
+      notify.error("Audio upload failed: " + error.message);
+      return;
+    }
+    const { data } = supabase.storage.from("listening-audio").getPublicUrl(path);
+    setAudioUrl(data.publicUrl);
+    notify.success("Audio uploaded — click Save to attach it.");
+  }
+
+  function handleRemoveAudio() {
+    setAudioUrl("");
+  }
+
   return (
     <form action={formAction} className="mb-4 flex flex-wrap items-end gap-2">
       <input type="hidden" name="testid" value={test.testid} />
+      <input type="hidden" name="audio_url" value={audioUrl} />
       <input name="title" defaultValue={test.title} required className="rounded-md border border-mist px-2 py-1.5 text-sm" />
       <select name="category" defaultValue={test.category} className="rounded-md border border-mist px-2 py-1.5 text-sm">
         <option value="Academic">Academic</option>
@@ -90,7 +115,21 @@ function EditTestForm({ test, onDone }: { test: PracticeTest; onDone: () => void
       </select>
       <input name="duration" type="number" defaultValue={test.duration} className="w-20 rounded-md border border-mist px-2 py-1.5 text-sm" />
       <input name="total_marks" type="number" defaultValue={test.total_marks} className="w-20 rounded-md border border-mist px-2 py-1.5 text-sm" />
-      <button type="submit" disabled={pending} className="rounded-pill bg-teal px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50">
+
+      <div className="flex flex-col gap-1">
+        <label className="text-xs font-medium text-ink">Listening audio</label>
+        <input type="file" accept="audio/*" onChange={handleAudioSelect} disabled={uploading} className="text-xs" />
+        {audioUrl && (
+          <div className="flex items-center gap-2">
+            <span className="text-xs text-teal">✓ {uploading ? "Uploading..." : "Audio set"}</span>
+            <button type="button" onClick={handleRemoveAudio} className="text-xs font-semibold text-danger hover:underline">
+              Remove
+            </button>
+          </div>
+        )}
+      </div>
+
+      <button type="submit" disabled={pending || uploading} className="rounded-pill bg-teal px-3 py-1.5 text-xs font-semibold text-white disabled:opacity-50">
         {pending ? "Saving..." : "Save"}
       </button>
       <button type="button" onClick={onDone} className="rounded-pill border border-mist px-3 py-1.5 text-xs font-semibold text-slate">
