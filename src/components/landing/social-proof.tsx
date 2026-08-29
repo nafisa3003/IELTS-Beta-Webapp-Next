@@ -1,210 +1,352 @@
 "use client"
 
-import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import { Star, Quote, ChevronLeft, ChevronRight } from "lucide-react"
+import { motion, useInView } from "framer-motion"
+import { Star, Quote } from "lucide-react"
+import { useRef, useState, useEffect } from "react"
 import { TiltCard } from "@/components/ui/tilt-card"
 
 const testimonials = [
   {
-    quote: "The instant granular feedback on Writing Task 2 saved me weeks of aimless rewriting. I went from stuck at 7.0 to an 8.5 in less than two months.",
+    quote:
+      "The instant granular feedback on Writing Task 2 saved me weeks of aimless rewriting. I went from stuck at 7.0 to an 8.5 in less than two months.",
     name: "Nawfat Haidar Chaudhury",
     score: "8.5",
     location: "Dhaka",
-    initials: "NC",
-    gradient: "from-[var(--navy)] to-[var(--teal)]",
     image: "/avatar/Nawfat.jpeg",
+    gradient: "from-navy to-teal",
   },
   {
-    quote: "The timed practice mode and real-time Band Score breakdowns felt exactly like taking the actual test. I hit my target score on my first attempt!",
+    quote:
+      "The timed practice mode and real-time Band Score breakdowns felt exactly like taking the actual test. I hit my target score on my first attempt!",
     name: "Fabiha Sanjeda Nuva",
     score: "8.0",
     location: "Sylhet",
-    initials: "FN",
-    gradient: "from-[var(--teal)] to-[#78FFF9]",
     image: "/avatar/Nuva.jpeg",
+    gradient: "from-teal to-cyan",
   },
   {
-    quote: "Keeping up with the daily practice streak kept me accountable. The immediate AI analysis for Speaking fluency gave me the confidence I needed.",
+    quote:
+      "Keeping up with the daily practice streak kept me accountable. The immediate AI analysis for Speaking fluency gave me the confidence I needed.",
     name: "Jannatul Ferdous Nishat",
     score: "8.0",
     location: "Chittagong",
-    initials: "JN",
-    gradient: "from-[var(--violet)] to-[var(--navy)]",
     image: "/avatar/Jannat.jpeg",
+    gradient: "from-violet to-navy",
   },
   {
-    quote: "The reading section explanations break down why every wrong answer is wrong. It completely transformed how I handle true/false/not given questions.",
+    quote:
+      "The reading section explanations break down why every wrong answer is wrong. It completely transformed how I handle true/false/not given questions.",
     name: "Shakila Jahan Tasnia",
     score: "7.5",
     location: "Dhaka",
-    initials: "ST",
-    gradient: "from-[var(--navy)] to-[var(--violet)]",
     image: "/avatar/Tasnia.jpeg",
+    gradient: "from-navy to-violet",
   },
   {
-    quote: "I loved the flexible micro-tests. Being able to practice 15-minute Speaking modules between classes helped me jump a full band score effortlessly.",
+    quote:
+      "I loved the flexible micro-tests. Being able to practice 15-minute Speaking modules between classes helped me jump a full band score effortlessly.",
     name: "Monisha Hossain",
     score: "7.5",
     location: "Sylhet",
-    initials: "MH",
-    gradient: "from-[#78FFF9] to-[var(--teal)]",
     image: "/avatar/Monisha.jpeg",
+    gradient: "from-cyan to-teal",
   },
   {
-    quote: "The structured layout and gamified feedback made studying less stressful. The instant writing evaluations pinpointed my exact grammar errors.",
+    quote:
+      "The structured layout and gamified feedback made studying less stressful. The instant writing evaluations pinpointed my exact grammar errors.",
     name: "Syeda Nafisa Tasnim",
     score: "7.0",
     location: "Dhaka",
-    initials: "NT",
-    gradient: "from-[var(--teal)] to-[var(--navy)]",
     image: "/avatar/Nafisa.jpeg",
+    gradient: "from-teal to-navy",
   },
 ]
 
-export function SocialProof() {
-  const [page, setPage] = useState(0)
-  const perPage = 3
-  const totalPages = Math.ceil(testimonials.length / perPage)
+/**
+ * Animated scramble effect for the main social-proof headline.
+ */
+function ScrambleText({
+  text,
+  className,
+}: {
+  text: string
+  className?: string
+}) {
+  const ref = useRef<HTMLHeadingElement>(null)
+  const isInView = useInView(ref, {
+    once: true,
+    margin: "-100px",
+  })
 
-  const visible = testimonials.slice(page * perPage, page * perPage + perPage)
+  const [display, setDisplay] = useState("")
 
-  const next = () => setPage((p) => Math.min(p + 1, totalPages - 1))
-  const prev = () => setPage((p) => Math.max(p - 1, 0))
+  const chars =
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*"
+
+  useEffect(() => {
+    if (!isInView) return
+
+    let iteration = 0
+
+    const interval = setInterval(() => {
+      setDisplay(
+        text
+          .split("")
+          .map((char, index) => {
+            if (
+              char === " " ||
+              char === "." ||
+              char === "'" ||
+              char === "?"
+            ) {
+              return char
+            }
+
+            if (index < iteration) {
+              return text[index]
+            }
+
+            return chars[Math.floor(Math.random() * chars.length)]
+          })
+          .join(""),
+      )
+
+      iteration += 1 / 2
+
+      if (iteration >= text.length) {
+        clearInterval(interval)
+        setDisplay(text)
+      }
+    }, 25)
+
+    return () => clearInterval(interval)
+  }, [isInView, text])
 
   return (
-    <section id="testimonials" className="relative">
-      {/* Big Statement */}
-      <div className="bg-[#78FFF9] py-20 md:py-28">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 text-center">
+    <h2 ref={ref} className={className}>
+      {display || text.split("").map(() => " ").join("")}
+    </h2>
+  )
+}
+
+/**
+ * Animated five-star rating.
+ */
+function StarBurst() {
+  return (
+    <motion.div
+      initial={{ scale: 0 }}
+      whileInView={{ scale: 1 }}
+      viewport={{ once: true }}
+      transition={{
+        type: "spring",
+        stiffness: 300,
+        damping: 20,
+      }}
+      className="flex items-center gap-0.5"
+    >
+      {[...Array(5)].map((_, index) => (
+        <motion.div
+          key={index}
+          initial={{ rotate: 0, scale: 0 }}
+          whileInView={{ rotate: 360, scale: 1 }}
+          viewport={{ once: true }}
+          transition={{
+            delay: index * 0.1,
+            type: "spring",
+            stiffness: 200,
+          }}
+        >
+          <Star className="h-4 w-4 fill-xp text-xp" />
+        </motion.div>
+      ))}
+    </motion.div>
+  )
+}
+
+/**
+ * Individual testimonial card.
+ *
+ * Uses TiltCard from the newer UI version while preserving
+ * the stronger brutalist styling and animations.
+ */
+function TestimonialCard({
+  testimonial,
+  index,
+}: {
+  testimonial: (typeof testimonials)[number]
+  index: number
+}) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{
+        delay: index * 0.1,
+        type: "spring",
+        stiffness: 100,
+      }}
+      className="min-w-[300px] shrink-0 md:min-w-[350px]"
+    >
+      <TiltCard
+        tiltAmount={5}
+        glowColor="rgba(14, 165, 153, 0.08)"
+      >
+        <div className="group relative flex h-full flex-col rounded-2xl border-3 border-ink bg-white p-5 shadow-hard transition-all hover:-translate-y-1 hover:shadow-brutalist">
+          {/* Rating */}
+          <StarBurst />
+
+          {/* Quote icon */}
+          <Quote className="mt-3 mb-2 h-5 w-5 text-teal/30" />
+
+          {/* Testimonial */}
+          <p className="mb-4 flex-1 text-sm font-medium leading-relaxed text-slate">
+            "{testimonial.quote}"
+          </p>
+
+          {/* Student information */}
+          <div className="flex items-center gap-3 border-t-2 border-mist pt-3">
+            <div
+              className={`relative h-10 w-10 shrink-0 overflow-hidden rounded-full bg-gradient-to-br ${testimonial.gradient} ring-2 ring-mist`}
+            >
+              <img
+                src={testimonial.image}
+                alt={testimonial.name}
+                className="h-full w-full object-cover"
+                loading="lazy"
+                onError={(event) => {
+                  event.currentTarget.style.display = "none"
+                }}
+              />
+            </div>
+
+            <div className="min-w-0">
+              <div className="truncate text-sm font-black text-ink">
+                {testimonial.name}
+              </div>
+
+              <div className="text-xs font-bold text-slate">
+                Scored {testimonial.score} · {testimonial.location}
+              </div>
+            </div>
+          </div>
+        </div>
+      </TiltCard>
+    </motion.div>
+  )
+}
+
+/**
+ * Infinite horizontal testimonial marquee.
+ */
+function InfiniteMarquee({
+  children,
+  direction = "left",
+}: {
+  children: React.ReactNode
+  direction?: "left" | "right"
+}) {
+  return (
+    <div className="relative overflow-hidden">
+      {/* Edge fade */}
+      <div className="pointer-events-none absolute inset-y-0 left-0 z-10 w-16 bg-gradient-to-r from-paper to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 z-10 w-16 bg-gradient-to-l from-paper to-transparent" />
+
+      <motion.div
+        className="flex w-max gap-4"
+        animate={{
+          x: direction === "left" ? [0, -1000] : [-1000, 0],
+        }}
+        transition={{
+          repeat: Infinity,
+          duration: 30,
+          ease: "linear",
+        }}
+      >
+        {children}
+        {children}
+      </motion.div>
+    </div>
+  )
+}
+
+export function SocialProof() {
+  const firstRow = testimonials.slice(0, 3)
+  const secondRow = testimonials.slice(3, 6)
+
+  return (
+    <section
+      id="testimonials"
+      className="relative overflow-hidden"
+    >
+      {/* =========================================================
+          BIG STATEMENT
+      ========================================================= */}
+      <div className="bg-cyan py-20 md:py-28">
+        <div className="mx-auto max-w-7xl px-4 text-center sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <h2 className="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-[#0F1720] mb-6">
-              Band scores you'll hit.<br />Guaranteed.
-            </h2>
-            <p className="text-lg md:text-xl text-[#334155] max-w-2xl mx-auto">
-              Thousands of learners across Bangladesh trust IELTS Beta to reach their target score. Here's what they have to say.
+            <ScrambleText
+              text="Band scores you'll hit. Guaranteed."
+              className="mb-6 text-5xl font-black leading-none tracking-tighter text-ink md:text-7xl lg:text-8xl"
+            />
+
+            <p className="mx-auto max-w-2xl text-lg font-medium text-slate md:text-xl">
+              Thousands of learners across Bangladesh trust IELTS Beta to
+              reach their target score. Here's what they have to say.
             </p>
           </motion.div>
         </div>
       </div>
 
-      {/* Testimonials Carousel */}
-      <div className="bg-[var(--paper)] py-20 md:py-28">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between mb-12">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-            >
-              <span className="inline-block text-sm font-bold tracking-widest text-[var(--teal)] uppercase mb-3">
-                Testimonials
-              </span>
-              <h3 className="text-3xl md:text-4xl font-black tracking-tight text-[#0F1720]">
-                Loved by students across Bangladesh
-              </h3>
-            </motion.div>
+      {/* =========================================================
+          TESTIMONIALS
+      ========================================================= */}
+      <div className="bg-paper py-12 md:py-16">
+        {/* Section heading */}
+        <div className="mb-8 px-4 text-center sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+          >
+            <span className="mb-2 inline-block text-sm font-black uppercase tracking-widest text-teal">
+              Testimonials
+            </span>
 
-            <div className="hidden md:flex items-center gap-2">
-              <button
-                onClick={prev}
-                disabled={page === 0}
-                className="h-12 w-12 rounded-full border-2 border-[var(--mist)] bg-white flex items-center justify-center text-[var(--navy)] hover:border-[var(--navy)]/30 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-              >
-                <ChevronLeft className="h-5 w-5" />
-              </button>
-              <button
-                onClick={next}
-                disabled={page === totalPages - 1}
-                className="h-12 w-12 rounded-full border-2 border-[var(--mist)] bg-white flex items-center justify-center text-[var(--navy)] hover:border-[var(--navy)]/30 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-              >
-                <ChevronRight className="h-5 w-5" />
-              </button>
-            </div>
-          </div>
+            <h3 className="text-3xl font-black tracking-tighter text-ink md:text-4xl">
+              Loved by students across Bangladesh
+            </h3>
+          </motion.div>
+        </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
-            <AnimatePresence mode="popLayout">
-              {visible.map((t, i) => (
-                <motion.div
-                  key={t.name}
-                  layout
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  transition={{ duration: 0.3, delay: i * 0.05 }}
-                >
-                  <TiltCard tiltAmount={6} glowColor="rgba(14, 165, 153, 0.08)">
-                    <div className="rounded-[var(--radius-lg)] border-2 border-[var(--mist)] bg-[var(--white)] p-6 flex flex-col hover:border-[var(--teal)]/20 transition-colors h-full">
-                      <div className="flex items-center gap-1 mb-4">
-                        {[...Array(5)].map((_, j) => (
-                          <Star key={j} className="h-4 w-4 fill-[var(--xp)] text-[var(--xp)]" />
-                        ))}
-                      </div>
-                      <Quote className="h-6 w-6 text-[var(--teal)]/30 mb-2" />
-                      <p className="text-[#334155] leading-relaxed flex-1 mb-6">
-                        "{t.quote}"
-                      </p>
-                      <div className="flex items-center gap-3 pt-4 border-t-2 border-[var(--mist)]">
-                        {/* REAL PROFILE PHOTO */}
-                        <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full ring-2 ring-[var(--mist)] bg-gradient-to-br from-[var(--navy)] to-[var(--teal)]">
-                          <img
-                            src={t.image}
-                            alt={t.name}
-                            className="h-full w-full object-cover"
-                            loading="lazy"
-                            onError={(e) => {
-                              // Fallback to initials if image fails to load
-                              const target = e.currentTarget
-                              target.style.display = "none"
-                              target.parentElement!.classList.add(
-                                "flex", "items-center", "justify-center",
-                                "bg-gradient-to-br", ...t.gradient.split(" ")
-                              )
-                              target.parentElement!.innerHTML = `<span class="text-white text-sm font-bold">${t.initials}</span>`
-                            }}
-                          />
-                          <div className="absolute inset-0 flex items-center justify-center text-white text-sm font-bold pointer-events-none">
-                          </div>
-                        </div>
-                        {/* /PROFILE PICTURE */}
+        {/* Desktop / mobile infinite testimonial rows */}
+        <div className="space-y-4">
+          <InfiniteMarquee direction="left">
+            {firstRow.map((testimonial, index) => (
+              <TestimonialCard
+                key={`first-${testimonial.name}`}
+                testimonial={testimonial}
+                index={index}
+              />
+            ))}
+          </InfiniteMarquee>
 
-                        <div>
-                          <div className="text-sm font-bold text-[#0F1720]">{t.name}</div>
-                          <div className="text-xs font-medium text-[#334155]">
-                            Scored {t.score} · {t.location}
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </TiltCard>
-                </motion.div>
-              ))}
-            </AnimatePresence>
-          </div>
-
-          {/* Mobile arrows */}
-          <div className="flex md:hidden items-center justify-center gap-2 mt-8">
-            <button
-              onClick={prev}
-              disabled={page === 0}
-              className="h-12 w-12 rounded-full border-2 border-[var(--mist)] bg-white flex items-center justify-center text-[var(--navy)] disabled:opacity-30"
-            >
-              <ChevronLeft className="h-5 w-5" />
-            </button>
-            <button
-              onClick={next}
-              disabled={page === totalPages - 1}
-              className="h-12 w-12 rounded-full border-2 border-[var(--mist)] bg-white flex items-center justify-center text-[var(--navy)] disabled:opacity-30"
-            >
-              <ChevronRight className="h-5 w-5" />
-            </button>
-          </div>
+          <InfiniteMarquee direction="right">
+            {secondRow.map((testimonial, index) => (
+              <TestimonialCard
+                key={`second-${testimonial.name}`}
+                testimonial={testimonial}
+                index={index + 3}
+              />
+            ))}
+          </InfiniteMarquee>
         </div>
       </div>
     </section>
