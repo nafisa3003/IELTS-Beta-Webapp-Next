@@ -151,7 +151,7 @@ class ResponseCache:
 
 
 # ---- Lightweight intent classification (heuristic first, LLM fallback) ----
-_GRADING_HINTS = ["grade my essay", "band score", "feedback on my writing", "check my essay", "mark my essay"]
+_GRADING_HINTS = ["grade my essay", "feedback on my writing", "check my essay", "mark my essay"]
 _VOCAB_HINTS = ["vocabulary", "vocab", "synonym", "word for"]
 _SPEAKING_HINTS = ["speaking part", "cue card", "fluency"]
 _LOGISTICS_HINTS = ["test date", "fee", "book my test", "one skill retake", "academic vs general", "registration"]
@@ -199,8 +199,6 @@ task2_rubric); base the other three criteria on shared_writing_criteria in both 
 
 class IELTSGraphEngine:
     def __init__(self):
-        # Comma-separated list of free-tier keys, e.g. GROQ_API_KEYS=key1,key2,key3
-        # Falls back to the single GROQ_API_KEY if the plural var isn't set.
         keys_env = os.getenv("GROQ_API_KEYS") or os.getenv("GROQ_API_KEY", "")
         self._groq_keys = [k.strip() for k in keys_env.split(",") if k.strip()]
         if not self._groq_keys:
@@ -291,15 +289,18 @@ class IELTSGraphEngine:
         prompt = [
             SystemMessage(content=(
                 "You are a strict but fair IELTS Writing Task 2 examiner. Score the "
-                f"essay below against this rubric:\n{rubric}\n\n{GRADING_SCHEMA_HINT}"
+                f"essay below against this rubric:\n{rubric}\n\n{GRADING_SCHEMA_HINT}\n\n"
+                "If the text below is NOT an actual essay to grade (e.g. it's a question "
+                "about scoring, or too short to be a real submission), respond with this "
+                'exact JSON instead: {"error": "no_essay_provided"}'
             )),
             HumanMessage(content=essay_text),
         ]
-        response = self._invoke_with_rotation(self.llm_json, prompt)
         try:
+            response = self._invoke_with_rotation(self.llm_json, prompt)
             draft = json.loads(response.content)
-        except Exception:
-            draft = {"error": "Could not parse grading output", "raw": response.content}
+        except Exception as e:
+            draft = {"error": "Could not parse grading output", "raw": str(e)}
         return {"grading_result": draft}
 
     def critique_node(self, state: ChatState):
@@ -307,6 +308,18 @@ class IELTSGraphEngine:
             (m.content for m in reversed(state["messages"]) if isinstance(m, HumanMessage)), ""
         )
         draft = state.get("grading_result", {})
+
+        # grade_node already flagged "no real essay was submitted" — skip the
+        # second LLM call entirely and reply conversationally instead of
+        # forcing JSON out of a model that has nothing to grade.
+        if draft.get("error") == "no_essay_provided":
+            msg = (
+                "I'm happy to assess your Writing Task essay and give you detailed "
+                "feedback — I'll just need the actual essay text first. Paste it "
+                "here and I'll evaluate it against the IELTS criteria."
+            )
+            return {"grading_result": None, "messages": [AIMessage(content=msg)]}
+
         rubric = retrieve_context(self.kb, "GRADING")
         prompt = [
             SystemMessage(content=(
@@ -318,11 +331,13 @@ class IELTSGraphEngine:
             )),
             HumanMessage(content="Review and return the final scores."),
         ]
-        response = self._invoke_with_rotation(self.llm_json, prompt)
         try:
+            response = self._invoke_with_rotation(self.llm_json, prompt)
             final = json.loads(response.content)
         except Exception:
-            final = draft
+            final = draft if "error" not in draft else {
+                "error": "Could not complete grading — please try pasting the essay again."
+            }
 
         final = self._attach_ml_second_opinion(final, essay_text)
         summary_text = self._format_grading_reply(final)
