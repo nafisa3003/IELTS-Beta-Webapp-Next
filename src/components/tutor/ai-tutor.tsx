@@ -134,7 +134,7 @@ export default function AiTutor({ userId, firstName }: { userId: string; firstNa
             <Bot className="h-5 w-5" style={{ color: "var(--white)" }} />
           </span>
           <div>
-            <h1 className="font-[var(--font-display)] text-xl font-bold" style={{ color: "var(--ink)" }}>
+            <h1 className="font-[var(--font-display)] text-xl font-black" style={{ color: "var(--ink)" }}>
               AI Tutor
             </h1>
             <p className="text-sm" style={{ color: "var(--slate)" }}>
@@ -157,8 +157,12 @@ export default function AiTutor({ userId, firstName }: { userId: string; firstNa
 
       {/* Chat window */}
       <div
-        className="flex flex-col rounded-[var(--radius-lg)] p-4"
-        style={{ background: "var(--paper)", boxShadow: "var(--shadow-card)" }}
+        className="flex flex-col rounded-[var(--radius-lg)] border-[3px] p-4"
+        style={{
+          background: "var(--paper)",
+          borderColor: "var(--ink)",
+          boxShadow: "var(--shadow-hard)",
+        }}
       >
         <div ref={scrollRef} className="flex max-h-[480px] min-h-[320px] flex-col gap-3 overflow-y-auto p-2">
           <AnimatePresence initial={false}>
@@ -172,15 +176,18 @@ export default function AiTutor({ userId, firstName }: { userId: string; firstNa
                 className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className="max-w-[80%] whitespace-pre-wrap rounded-[var(--radius-lg)] px-4 py-2.5 text-sm leading-relaxed"
+                  className={`max-w-[80%] whitespace-pre-wrap rounded-[var(--radius-lg)] px-4 py-2.5 text-sm leading-relaxed ${
+                    m.role === "bot" ? "border-[3px]" : ""
+                  }`}
                   style={
                     m.role === "user"
                       ? { background: "var(--teal)", color: "var(--white)", borderBottomRightRadius: 6 }
                       : {
                           background: "var(--white)",
                           color: "var(--ink)",
+                          borderColor: "var(--ink)",
                           borderBottomLeftRadius: 6,
-                          boxShadow: "var(--shadow-card)",
+                          boxShadow: "var(--shadow-hard)",
                         }
                   }
                 >
@@ -239,8 +246,13 @@ export default function AiTutor({ userId, firstName }: { userId: string; firstNa
             key={label}
             onClick={() => sendMessage(prompt)}
             disabled={isLoading}
-            className="flex items-center gap-1.5 rounded-[var(--radius-pill)] px-3.5 py-2 text-xs font-medium transition-transform hover:-translate-y-0.5 disabled:opacity-50"
-            style={{ background: "var(--white)", color: "var(--slate)", boxShadow: "var(--shadow-card)" }}
+            className="flex items-center gap-1.5 rounded-[var(--radius-pill)] border-2 px-3.5 py-2 text-xs font-black transition-transform hover:-translate-y-0.5 disabled:opacity-50"
+            style={{
+              background: "var(--white)",
+              color: "var(--slate)",
+              borderColor: "var(--ink)",
+              boxShadow: "var(--shadow-hard)",
+            }}
           >
             <Icon className="h-3.5 w-3.5" style={{ color: "var(--teal)" }} />
             {label}

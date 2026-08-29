@@ -45,7 +45,7 @@ export default function OnboardingLayout({
       {/* LEFT PANEL — mint */}
       <aside
         className="relative hidden lg:flex flex-col justify-between p-10 overflow-hidden"
-        style={{ backgroundColor: "#9efff5" }}
+        style={{ backgroundColor: "var(--cyan)" }}
       >
         {/* Back arrow */}
         <button
