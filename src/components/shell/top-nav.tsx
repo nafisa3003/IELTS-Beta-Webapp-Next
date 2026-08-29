@@ -108,7 +108,7 @@ export function TopNav({
             : "border-transparent dark:bg-navy-deep/60"
         }`}
       >
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
+        <div className="mx-auto flex h-16 max-w-full items-center justify-between px-2 sm:px-3 lg:px-4">
           {/* Logo */}
           <div className="flex items-center gap-2.5">
             <Link href="/" className="flex items-center gap-2.5">
@@ -119,7 +119,7 @@ export function TopNav({
                 height={30}
                 className="h-[60px] w-auto object-contain [filter:drop-shadow(1px_0_0_#fff)_drop-shadow(-1px_0_0_#fff)_drop-shadow(0_1px_0_#fff)_drop-shadow(0_-1px_0_#fff)]"
               />
-              <span className="text-xl font-extrabold tracking-tight text-navy dark:text-white">
+              <span className="text-xl font-extrabold tracking-tight text-navy">
                 IELTS Beta
               </span>
             </Link>

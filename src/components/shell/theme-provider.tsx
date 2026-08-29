@@ -1,11 +1,12 @@
 "use client";
 
+import * as React from "react";
 import { ThemeProvider as NextThemesProvider } from "next-themes";
-import type { ThemeProviderProps } from "next-themes/dist/types";
 
-// Matches the existing `.dark { ... }` token block in globals.css —
-// next-themes just toggles the `dark` class on <html>, tokens already exist.
-export function ThemeProvider({ children, ...props }: ThemeProviderProps) {
+export function ThemeProvider({ 
+  children, 
+  ...props 
+}: React.ComponentProps<typeof NextThemesProvider>) {
   return (
     <NextThemesProvider attribute="class" defaultTheme="light" enableSystem {...props}>
       {children}
