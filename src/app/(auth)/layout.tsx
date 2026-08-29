@@ -14,7 +14,7 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
           className="transition-opacity hover:opacity-80"
         >
           {/* LOGO FIX: white badge so transparent PNG is visible */}
-          <div className="rounded-xl bg-white p-2.5 shadow-card ring-1 ring-mist">
+          <div className="rounded-xl border-3 border-ink bg-white p-2.5 shadow-hard">
             <Image
               src="/logo.png"
               alt="IELTS Beta"

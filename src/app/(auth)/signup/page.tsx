@@ -152,7 +152,7 @@ export default function SignupPage() {
           Start your journey
         </p>
 
-        <h1 className="text-[28px] font-bold tracking-tight text-ink sm:text-[32px]">
+        <h1 className="text-[28px] font-black tracking-tight text-ink sm:text-[32px]">
           Create your IELTS Beta account
         </h1>
 
@@ -184,8 +184,7 @@ export default function SignupPage() {
         onClick={() =>
           notify.info("Google sign-up will be connected next.")
         }
-        /* FIXED TYPO: was `duration-200hover:border` and `focus-visible:ring-4focus-visible:ring-teal/10` */
-        className="flex h-12 w-full items-center justify-center gap-3 rounded-lg border border-mist bg-surface text-sm font-semibold text-ink shadow-sm transition-all duration-200 hover:border-slate-soft hover:shadow-card focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-teal/10"
+        className="flex h-12 w-full items-center justify-center gap-3 rounded-xl border-3 border-ink bg-surface text-sm font-black text-ink shadow-hard transition-all duration-200 hover:shadow-brutalist focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-teal/10"
       >
         <GoogleIcon />
         Continue with Google
@@ -284,8 +283,7 @@ export default function SignupPage() {
         <button
           type="submit"
           disabled={isSubmitting}
-          /* FIXED TYPO: was `bg-tealpx-5` */
-          className="mt-1 flex h-12 w-full items-center justify-center rounded-lg bg-teal px-5 text-sm font-bold text-white shadow-sm transition-all duration-200 hover:bg-teal-deep hover:shadow-card focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-teal/20 disabled:cursor-not-allowed disabled:opacity-60"
+          className="mt-1 flex h-12 w-full items-center justify-center rounded-xl border-3 border-ink bg-teal px-5 text-sm font-black text-white shadow-hard transition-all duration-200 hover:shadow-brutalist focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-teal/20 disabled:cursor-not-allowed disabled:opacity-60"
         >
           {isSubmitting ? "Creating your account…" : "Create account"}
         </button>
