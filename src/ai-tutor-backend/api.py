@@ -32,6 +32,7 @@ class ChatRequest(BaseModel):
 class ChatResponse(BaseModel):
     reply: str
     thread_id: str
+    band_scores: dict | None = None  # includes ml_second_opinion when a grading turn ran
 
 
 @app.get("/health")
@@ -50,8 +51,12 @@ def chat(req: ChatRequest):
     if not req.message.strip():
         raise HTTPException(status_code=422, detail="Message cannot be empty.")
     try:
-        reply = engine.run(req.message, thread_id=req.thread_id)
-        return ChatResponse(reply=reply, thread_id=req.thread_id)
+        result = engine.run(req.message, thread_id=req.thread_id)
+        return ChatResponse(
+            reply=result["reply"],
+            thread_id=req.thread_id,
+            band_scores=result.get("band_scores"),
+        )
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Engine error: {str(e)}")
 

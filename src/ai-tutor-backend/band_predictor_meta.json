@@ -1,0 +1,30 @@
+{
+  "model_type": "random_forest",
+  "feature_columns": [
+    "task_type",
+    "word_count",
+    "sentence_count",
+    "paragraph_count",
+    "avg_sentence_length",
+    "sentence_length_std",
+    "avg_word_length",
+    "long_word_ratio",
+    "type_token_ratio",
+    "unique_word_count",
+    "connector_count",
+    "connector_density",
+    "informal_marker_count",
+    "spelling_error_count",
+    "spelling_error_rate",
+    "top_word_ratio",
+    "flesch_reading_ease",
+    "flesch_kincaid_grade",
+    "question_overlap"
+  ],
+  "held_out_mae": 0.661,
+  "held_out_rmse": 0.909,
+  "held_out_r2": 0.279,
+  "within_half_band_pct": 64.3,
+  "n_train_rows": 1274,
+  "note": "Trained only on Overall band \u2014 sub-criteria columns in source CSV were empty."
+}
