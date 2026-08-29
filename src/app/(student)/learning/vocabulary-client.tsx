@@ -162,8 +162,8 @@ export function VocabularyClient({
       {tab === "bank" ? (
         <div className="flex flex-col gap-6">
           {/* Saved words strip */}
-          <section className="rounded-lg bg-surface p-6 shadow-card">
-            <h2 className="mb-3 font-display text-lg font-semibold text-ink">Saved words</h2>
+          <section className="rounded-2xl border-3 border-ink bg-surface p-6 shadow-hard">
+            <h2 className="mb-3 font-display text-lg font-black text-ink">Saved words</h2>
             {savedIds.size === 0 ? (
               <p className="text-sm text-slate-soft">Tap the bookmark on a flipped card to save it here.</p>
             ) : (
@@ -190,10 +190,10 @@ export function VocabularyClient({
           </section>
 
           {/* Word bank study card */}
-          <section className="rounded-lg bg-surface p-6 shadow-card">
+          <section className="rounded-2xl border-3 border-ink bg-surface p-6 shadow-hard">
             <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
               <div>
-                <h2 className="font-display text-lg font-semibold text-ink">IELTS Word Bank</h2>
+                <h2 className="font-display text-lg font-black text-ink">IELTS Word Bank</h2>
                 <p className="text-xs text-slate-soft">
                   Study {allWords.length} academic words and manage your own list
                 </p>
@@ -245,7 +245,7 @@ export function VocabularyClient({
 
                   <div className="relative h-56 flex-1 [perspective:1200px]">
                     <motion.div
-                      className="absolute inset-0 cursor-pointer rounded-lg shadow-float"
+                      className="absolute inset-0 cursor-pointer rounded-2xl shadow-hard"
                       style={{ transformStyle: "preserve-3d" }}
                       animate={{ rotateY: flipped ? 180 : 0 }}
                       transition={{ duration: 0.45 }}
@@ -253,16 +253,16 @@ export function VocabularyClient({
                     >
                       {/* Front */}
                       <div
-                        className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-lg border border-mist bg-cyan-light [backface-visibility:hidden]"
+                        className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-2xl border-3 border-ink bg-cyan-light [backface-visibility:hidden]"
                       >
                         <DifficultyBadge level={activeWord.difficulty} />
-                        <p className="font-display text-3xl font-bold text-navy">{activeWord.word}</p>
+                        <p className="font-display text-3xl font-black text-navy">{activeWord.word}</p>
                         <p className="text-xs text-slate-soft">Click to reveal</p>
                       </div>
 
                       {/* Back */}
                       <div
-                        className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-lg bg-navy-deep px-8 text-center text-white [backface-visibility:hidden]"
+                        className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-2xl border-3 border-ink bg-navy-deep px-8 text-center text-white [backface-visibility:hidden]"
                         style={{ transform: "rotateY(180deg)" }}
                       >
                         <p className="text-lg font-semibold">{activeWord.definition}</p>
@@ -320,9 +320,9 @@ export function VocabularyClient({
         <div className="flex flex-col gap-6">
           <section className="grid gap-6 lg:grid-cols-[1fr_1fr]">
             {/* Create / edit form */}
-            <div className="rounded-lg bg-surface p-6 shadow-card">
+            <div className="rounded-2xl border-3 border-ink bg-surface p-6 shadow-hard">
               <div className="mb-4 flex items-center justify-between">
-                <h2 className="font-display text-lg font-semibold text-ink">
+                <h2 className="font-display text-lg font-black text-ink">
                   {editingCard ? "Edit Custom Card" : "Create Custom Card"}
                 </h2>
                 {editingCard && (
@@ -383,7 +383,7 @@ export function VocabularyClient({
                 </div>
                 <button
                   type="submit"
-                  className="rounded-pill bg-teal px-4 py-2 text-sm font-semibold text-white hover:opacity-90"
+                  className="rounded-pill border-2 border-ink bg-teal px-4 py-2 text-sm font-black text-white shadow-hard transition-all hover:shadow-brutalist"
                 >
                   {editingCard ? "Save changes" : "Save Flashcard"}
                 </button>
@@ -391,24 +391,24 @@ export function VocabularyClient({
             </div>
 
             {/* Live preview / flip card */}
-            <div className="flex flex-col items-center justify-center rounded-lg bg-surface p-6 shadow-card">
+            <div className="flex flex-col items-center justify-center rounded-2xl border-3 border-ink bg-surface p-6 shadow-hard">
               <div className="relative h-64 w-full max-w-sm [perspective:1200px]">
                 <motion.div
-                  className="absolute inset-0 cursor-pointer rounded-lg shadow-float"
+                  className="absolute inset-0 cursor-pointer rounded-2xl shadow-hard"
                   style={{ transformStyle: "preserve-3d" }}
                   animate={{ rotateY: customFlipped ? 180 : 0 }}
                   transition={{ duration: 0.45 }}
                   onClick={() => setCustomFlipped((f) => !f)}
                 >
-                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-lg border border-mist bg-cyan-light px-6 text-center [backface-visibility:hidden]">
-                    <span className="text-[10px] font-semibold uppercase tracking-wide text-teal-deep">
+                  <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 rounded-2xl border-3 border-ink bg-cyan-light px-6 text-center [backface-visibility:hidden]">
+                    <span className="text-[10px] font-black uppercase tracking-wide text-teal-deep">
                       Custom card
                     </span>
-                    <p className="font-display text-2xl font-bold text-navy">{livePreview.front}</p>
+                    <p className="font-display text-2xl font-black text-navy">{livePreview.front}</p>
                     <p className="text-xs text-slate-soft">Click to flip</p>
                   </div>
                   <div
-                    className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-lg bg-navy-deep px-6 text-center text-white [backface-visibility:hidden]"
+                    className="absolute inset-0 flex flex-col items-center justify-center gap-3 rounded-2xl border-3 border-ink bg-navy-deep px-6 text-center text-white [backface-visibility:hidden]"
                     style={{ transform: "rotateY(180deg)" }}
                   >
                     <p className="text-base font-semibold">{livePreview.back}</p>
@@ -442,8 +442,8 @@ export function VocabularyClient({
           </section>
 
           {/* Personal words grid */}
-          <section className="rounded-lg bg-surface p-6 shadow-card">
-            <h2 className="mb-4 font-display text-lg font-semibold text-ink">My Personal Words</h2>
+          <section className="rounded-2xl border-3 border-ink bg-surface p-6 shadow-hard">
+            <h2 className="mb-4 font-display text-lg font-black text-ink">My Personal Words</h2>
             {customCards.length === 0 ? (
               <p className="text-sm text-slate-soft">No custom flashcards yet.</p>
             ) : (
