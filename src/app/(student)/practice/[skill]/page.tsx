@@ -42,6 +42,13 @@ export default async function PracticeSkillPage({
   return (
     <div className="flex flex-col gap-4">
       <h1 className="font-display text-2xl font-semibold text-navy dark:text-white">{skill} Practice</h1>
+      {(skill === "Writing" || skill === "Speaking") && (
+        <p className="rounded-md border border-teal/30 bg-teal/5 px-4 py-2 text-sm text-slate-soft">
+          Your response is recorded but not auto-scored. Once submitted, paste it into the{" "}
+          <a href="/tutor" className="font-semibold text-teal underline">AI Tutor</a> for instant feedback,
+          or wait for your teacher's rubric grade.
+        </p>
+      )}
       {tests.length === 0 ? (
         <p className="text-sm text-slate-soft">
           No {skill.toLowerCase()} tests available in your enrolled courses yet.
