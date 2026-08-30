@@ -2,6 +2,9 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import remarkBreaks from "remark-breaks";
 import {
   Bot,
   Send,
@@ -44,6 +47,42 @@ function makeThreadId(userId: string) {
   ).padStart(2, "0")}`;
   return `user_${userId}_${ymd}`;
 }
+
+// Keeps LLM/grading markdown (bold headers, bullet lists, emphasis) tight
+// and consistent with the chat bubble's existing font size/line-height,
+// instead of the default browser markdown spacing which looks too loose
+// inside a small chat bubble.
+const markdownComponents = {
+  p: ({ children }: { children?: React.ReactNode }) => <p className="mb-2 last:mb-0">{children}</p>,
+  strong: ({ children }: { children?: React.ReactNode }) => (
+    <strong className="font-semibold">{children}</strong>
+  ),
+  em: ({ children }: { children?: React.ReactNode }) => <em className="italic">{children}</em>,
+  ul: ({ children }: { children?: React.ReactNode }) => (
+    <ul className="mb-2 ml-4 list-disc space-y-1 last:mb-0">{children}</ul>
+  ),
+  ol: ({ children }: { children?: React.ReactNode }) => (
+    <ol className="mb-2 ml-4 list-decimal space-y-1 last:mb-0">{children}</ol>
+  ),
+  li: ({ children }: { children?: React.ReactNode }) => <li>{children}</li>,
+  h1: ({ children }: { children?: React.ReactNode }) => (
+    <p className="mb-1 text-base font-bold">{children}</p>
+  ),
+  h2: ({ children }: { children?: React.ReactNode }) => (
+    <p className="mb-1 text-base font-bold">{children}</p>
+  ),
+  h3: ({ children }: { children?: React.ReactNode }) => <p className="mb-1 font-bold">{children}</p>,
+  code: ({ children }: { children?: React.ReactNode }) => (
+    <code className="rounded px-1 py-0.5 text-xs" style={{ background: "var(--mist)" }}>
+      {children}
+    </code>
+  ),
+  a: ({ children, href }: { children?: React.ReactNode; href?: string }) => (
+    <a href={href} target="_blank" rel="noreferrer" className="underline">
+      {children}
+    </a>
+  ),
+};
 
 export default function AiTutor({ userId, firstName }: { userId: string; firstName: string }) {
   const threadId = useRef(makeThreadId(userId)).current;
@@ -134,7 +173,7 @@ export default function AiTutor({ userId, firstName }: { userId: string; firstNa
             <Bot className="h-5 w-5" style={{ color: "var(--white)" }} />
           </span>
           <div>
-            <h1 className="font-[var(--font-display)] text-xl font-black" style={{ color: "var(--ink)" }}>
+            <h1 className="font-[var(--font-display)] text-xl font-bold" style={{ color: "var(--ink)" }}>
               AI Tutor
             </h1>
             <p className="text-sm" style={{ color: "var(--slate)" }}>
@@ -157,12 +196,8 @@ export default function AiTutor({ userId, firstName }: { userId: string; firstNa
 
       {/* Chat window */}
       <div
-        className="flex flex-col rounded-[var(--radius-lg)] border-[3px] p-4"
-        style={{
-          background: "var(--paper)",
-          borderColor: "var(--ink)",
-          boxShadow: "var(--shadow-hard)",
-        }}
+        className="flex flex-col rounded-[var(--radius-lg)] p-4"
+        style={{ background: "var(--paper)", boxShadow: "var(--shadow-card)" }}
       >
         <div ref={scrollRef} className="flex max-h-[480px] min-h-[320px] flex-col gap-3 overflow-y-auto p-2">
           <AnimatePresence initial={false}>
@@ -176,18 +211,15 @@ export default function AiTutor({ userId, firstName }: { userId: string; firstNa
                 className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div
-                  className={`max-w-[80%] whitespace-pre-wrap rounded-[var(--radius-lg)] px-4 py-2.5 text-sm leading-relaxed ${
-                    m.role === "bot" ? "border-[3px]" : ""
-                  }`}
+                  className="max-w-[80%] rounded-[var(--radius-lg)] px-4 py-2.5 text-sm leading-relaxed"
                   style={
                     m.role === "user"
                       ? { background: "var(--teal)", color: "var(--white)", borderBottomRightRadius: 6 }
                       : {
                           background: "var(--white)",
                           color: "var(--ink)",
-                          borderColor: "var(--ink)",
                           borderBottomLeftRadius: 6,
-                          boxShadow: "var(--shadow-hard)",
+                          boxShadow: "var(--shadow-card)",
                         }
                   }
                 >
@@ -200,7 +232,12 @@ export default function AiTutor({ userId, firstName }: { userId: string; firstNa
                       Thinking…
                     </span>
                   ) : (
-                    m.content
+                    <ReactMarkdown
+                      remarkPlugins={[remarkGfm, remarkBreaks]}
+                      components={markdownComponents}
+                    >
+                      {m.content}
+                    </ReactMarkdown>
                   )}
                 </div>
               </motion.div>
@@ -246,13 +283,8 @@ export default function AiTutor({ userId, firstName }: { userId: string; firstNa
             key={label}
             onClick={() => sendMessage(prompt)}
             disabled={isLoading}
-            className="flex items-center gap-1.5 rounded-[var(--radius-pill)] border-2 px-3.5 py-2 text-xs font-black transition-transform hover:-translate-y-0.5 disabled:opacity-50"
-            style={{
-              background: "var(--white)",
-              color: "var(--slate)",
-              borderColor: "var(--ink)",
-              boxShadow: "var(--shadow-hard)",
-            }}
+            className="flex items-center gap-1.5 rounded-[var(--radius-pill)] px-3.5 py-2 text-xs font-medium transition-transform hover:-translate-y-0.5 disabled:opacity-50"
+            style={{ background: "var(--white)", color: "var(--slate)", boxShadow: "var(--shadow-card)" }}
           >
             <Icon className="h-3.5 w-3.5" style={{ color: "var(--teal)" }} />
             {label}

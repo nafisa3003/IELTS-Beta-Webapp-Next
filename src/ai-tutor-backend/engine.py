@@ -380,31 +380,31 @@ class IELTSGraphEngine:
         content_label = result.get("content_criterion_name", "Task Response")
         content = result.get("content_criterion", {})
 
-        lines = [f"{task_type} — Overall Band: {result.get('overall_band', '?')}", ""]
-        lines.append(f"{content_label}: {content.get('score', '?')}/9 — {content.get('comment', '')}")
+        lines = [f"**{task_type} — Overall Band: {result.get('overall_band', '?')}**", ""]
+        lines.append(f"**{content_label}: {content.get('score', '?')}/9** — {content.get('comment', '')}")
         for key, label in [
             ("coherence_cohesion", "Coherence & Cohesion"),
             ("lexical_resource", "Lexical Resource"),
             ("grammatical_range_accuracy", "Grammatical Range & Accuracy"),
         ]:
             c = result.get(key, {})
-            lines.append(f"{label}: {c.get('score', '?')}/9 — {c.get('comment', '')}")
+            lines.append(f"**{label}: {c.get('score', '?')}/9** — {c.get('comment', '')}")
 
         improvements = result.get("improvements", [])
         if improvements:
             lines.append("")
-            lines.append("Where to improve:")
+            lines.append("**Where to improve:**")
             for imp in improvements:
                 lines.append(
-                    f"• {imp.get('location', '')}: {imp.get('issue', '')} → {imp.get('suggestion', '')}"
+                    f"- **{imp.get('location', '')}**: {imp.get('issue', '')} → {imp.get('suggestion', '')}"
                 )
 
         ml = result.get("ml_second_opinion")
         if ml and ml.get("significant_disagreement"):
             lines.append("")
             lines.append(
-                f"Note: an independent statistical check estimated this essay closer to "
-                f"band {ml['predicted_band']} — flagging in case you'd like a second look."
+                f"*Note: an independent statistical check estimated this essay closer to "
+                f"band {ml['predicted_band']} — flagging in case you'd like a second look.*"
             )
 
         lines.append("")

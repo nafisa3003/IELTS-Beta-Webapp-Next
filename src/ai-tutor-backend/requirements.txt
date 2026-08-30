@@ -17,3 +17,7 @@ textstat
 pandas
 numpy
 pyspellchecker
+
+react-markdown 
+remark-gfm 
+remark-breaks
