@@ -10,6 +10,7 @@ const config: Config = {
         teal: { DEFAULT: "var(--teal)", deep: "var(--teal-deep)" },
         violet: { DEFAULT: "var(--violet)", deep: "var(--violet-deep)" },
         coral: { DEFAULT: "var(--coral)", deep: "var(--coral-deep)" },
+        cyan: 'var(--cyan)',
         ink: "var(--ink)",
         slate: { DEFAULT: "var(--slate)", soft: "var(--slate-soft)" },
         mist: "var(--mist)",
