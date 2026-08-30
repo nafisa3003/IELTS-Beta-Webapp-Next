@@ -105,7 +105,7 @@ export function LandingNav({ user, displayName = "", role = "student", avatarUrl
                 height={30}
                 className="h-[90px] w-auto object-contain [filter:drop-shadow(1px_0_0_#fff)_drop-shadow(-1px_0_0_#fff)_drop-shadow(0_1px_0_#fff)_drop-shadow(0_-1px_0_#fff)]"
               />
-              <span className={`text-xl font-extrabold tracking-tight dark:text-white ${scrolled ? "text-[var(--navy)]" : "text-white"}`}>
+              <span className="text-xl font-extrabold tracking-tight text-[var(--navy)] dark:text-white">
                 IELTS Beta
               </span>
             </Link>
