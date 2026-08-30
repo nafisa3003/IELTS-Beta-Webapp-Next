@@ -1112,3 +1112,147 @@ ALTER TABLE public.user_custom_cards
 ALTER TABLE public.user_custom_cards
   ADD CONSTRAINT user_custom_cards_difficulty_check
   CHECK (difficulty IS NULL OR difficulty IN ('easy', 'medium', 'hard'));
+
+-- 0017_persons_owner_update.sql
+
+create policy "own person row update" on public.persons
+  for update using (
+    personid in (select personid from public.users where userid = auth.uid())
+  )
+  with check (
+    personid in (select personid from public.users where userid = auth.uid())
+  );
+
+-- 0018_admin_read_all_admins.sql
+
+drop policy if exists "own admin row" on public.admins;
+create policy "own admin row" on public.admins
+  for select using (userid = auth.uid() or public.current_app_role() = 'admin');
+
+-- 0019_teacher_reads_student_users.sql
+create policy "teacher reads student users" on public.users
+  for select using (
+    public.current_app_role() = 'teacher'
+    and role = 'student'
+  );
+
+-- 0020_reading_listening_upgrade.sql
+
+alter table public.practice_tests
+  add column audio_url text;
+
+create table public.passages (
+  passageid uuid primary key default gen_random_uuid(),
+  testid uuid not null references public.practice_tests(testid) on delete cascade,
+  title text not null,
+  passage_text text not null,
+  order_index int not null default 1
+);
+
+alter table public.questions
+  add column passageid uuid references public.passages(passageid) on delete cascade;
+
+create table public.written_responses (
+  responseid uuid primary key default gen_random_uuid(),
+  attemptid uuid not null references public.test_attempts(attemptid) on delete cascade,
+  questionid uuid not null references public.questions(questionid) on delete cascade,
+  answer_text text not null default '',
+  unique (attemptid, questionid)
+);
+
+alter table public.passages enable row level security;
+alter table public.written_responses enable row level security;
+
+create policy "read passages via test access" on public.passages
+  for select using (
+    exists (select 1 from public.practice_tests t where t.testid = passages.testid)
+  );
+create policy "admin writes passages" on public.passages
+  for all using (public.current_app_role() = 'admin');
+
+create policy "student manages own written_responses" on public.written_responses
+  for select using (
+    exists (
+      select 1 from public.test_attempts a
+      where a.attemptid = written_responses.attemptid
+        and (
+          a.studentid = public.current_student_id()
+          or public.current_app_role() = 'admin'
+          or exists (
+            select 1 from public.practice_tests t
+            join public.teacher_courses tc on tc.courseid = t.courseid
+            join public.questions q on q.testid = t.testid
+            where q.questionid = written_responses.questionid and tc.teacherid = public.current_teacher_id()
+          )
+        )
+    )
+  );
+create policy "system writes written_responses" on public.written_responses
+  for insert with check (
+    exists (
+      select 1 from public.test_attempts a
+      where a.attemptid = written_responses.attemptid and a.studentid = public.current_student_id()
+    )
+  );
+
+-- 0021_listening_audio_storage_policy.sql
+
+-- Allow admins to upload audio files into the listening-audio bucket
+create policy "admin uploads listening audio"
+on storage.objects
+for insert
+to authenticated
+with check (
+  bucket_id = 'listening-audio'
+  and public.current_app_role() = 'admin'
+);
+
+-- Allow admins to update/replace existing audio files
+create policy "admin updates listening audio"
+on storage.objects
+for update
+to authenticated
+using (
+  bucket_id = 'listening-audio'
+  and public.current_app_role() = 'admin'
+);
+
+-- Allow admins to delete audio files
+create policy "admin deletes listening audio"
+on storage.objects
+for delete
+to authenticated
+using (
+  bucket_id = 'listening-audio'
+  and public.current_app_role() = 'admin'
+);
+
+-- Public read (needed for the <audio> tag to actually play the file for students)
+create policy "anyone reads listening audio"
+on storage.objects
+for select
+to public
+using (bucket_id = 'listening-audio');
+
+-- 0023_student_reads_teacher_courses.sql
+
+create or replace function public.student_is_enrolled_in_course(p_courseid uuid)
+returns boolean
+language sql
+security definer
+set search_path = public
+stable
+as $$
+  select exists (
+    select 1 from public.enrollments e
+    where e.courseid = p_courseid
+      and e.studentid = public.current_student_id()
+      and e.status = 'active'
+  );
+$$;
+
+create policy "student reads enrolled teacher_courses"
+on public.teacher_courses
+for select
+to authenticated
+using (public.student_is_enrolled_in_course(teacher_courses.courseid));
