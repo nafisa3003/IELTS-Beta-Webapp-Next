@@ -12,7 +12,13 @@ app = FastAPI(title="IELTS Beta AI Tutor", version="1.0.0")
 # Allow requests from your PHP web server (localhost)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost", "http://127.0.0.1", "http://localhost:8080", "*"],
+    allow_origins=[
+        "http://localhost",
+        "http://127.0.0.1",
+        "http://localhost:8080",
+        "http://localhost:3000",
+        "https://ielts-beta-webapp-next.vercel.app/",
+    ],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
