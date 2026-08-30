@@ -6,6 +6,9 @@ The application is an **ERD-driven Next.js + Supabase rebuild** focused on IELTS
 
 ---
 
+🔗 **[Live Demo](https://ielts-beta-webapp-next.vercel.app/)**
+🎥 **[Full Walkthrough Video](#)** — Student, Teacher, and Admin flows *(link pending)*
+
 ## Features
 
 - Student dashboard with band and skill progress analytics
@@ -102,14 +105,6 @@ Visit `http://localhost:3000`. Sign up as a student and as a teacher (two accoun
 ## Screenshots
 
 > Screenshots of the final interface will be added here after the visual refinement phase.
-
----
-
-## Development Status
-
-**Status:** Active Development
-
-Current work includes final visual refinement, remaining Teacher/Admin pages, application state handling, responsive/accessibility refinement, and final verification/testing.
 
 ---
 
