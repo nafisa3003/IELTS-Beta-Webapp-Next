@@ -1,6 +1,8 @@
 import { createClient } from "@/lib/supabase/server"
 import { CourseService } from "@/lib/services/course-service"
 import { getCurrentStudentId } from "@/lib/auth/current-user"
+import { GamificationRepository } from "@/lib/repositories/gamification.repository"
+import { TestResultRepository } from "@/lib/repositories/test-result.repository"
 import DashboardClient from "./dashboard-client"
 
 export default async function DashboardPage() {
@@ -28,8 +30,14 @@ export default async function DashboardPage() {
 
   const supabase = await createClient()
   const courseService = new CourseService(supabase)
+  const gamificationRepo = new GamificationRepository(supabase)
+  const testResultRepo = new TestResultRepository(supabase)
 
-  const [views, student] = await Promise.all([
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  const [views, student, xpTotal, streak, skillBands] = await Promise.all([
     courseService.getStudentLearningView(studentid),
 
     supabase
@@ -44,12 +52,25 @@ export default async function DashboardPage() {
             target_band: number | null
           } | null,
       ),
+
+    // XP/streak are keyed by userid (auth identity), not studentid —
+    // same repository rewards/page.tsx already uses successfully.
+    user ? gamificationRepo.getXpTotal(user.id) : Promise.resolve(0),
+    user ? gamificationRepo.getStreak(user.id) : Promise.resolve(null),
+
+    testResultRepo.findLatestSkillBandsForStudent(studentid),
   ])
+
+  const levelInfo = gamificationRepo.getLevelInfo(xpTotal)
 
   return (
     <DashboardClient
       views={views}
       student={student}
+      xpTotal={xpTotal}
+      streak={streak}
+      levelInfo={levelInfo}
+      skillBands={skillBands}
     />
   )
 }

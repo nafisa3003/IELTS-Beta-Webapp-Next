@@ -12,6 +12,8 @@ import { XpGem } from "@/components/gamification/xp-gem"
 import { AnimatedFlame } from "@/components/gamification/animated-flame"
 import { LevelBadge } from "@/components/gamification/level-badge"
 import { BookIcon } from "@/components/icons/stat-icons"
+import type { LevelInfo } from "@/lib/repositories/gamification.repository"
+import type { Skill } from "@/types/assessment"
 
 type DashboardView = {
   course: {
@@ -27,38 +29,18 @@ type StudentData = {
   target_band: number | null
 }
 
+type StreakData = {
+  current_streak: number
+  longest_streak: number
+} | null
+
 type DashboardClientProps = {
   views: DashboardView[]
   student: StudentData | null
-}
-
-/**
- * INTENTIONAL DEMO DATA
- *
- * These values are temporary until the corresponding
- * practice/gamification systems have real activity.
- *
- * Do NOT replace these with database values yet.
- */
-const DASHBOARD_DEMO_DATA = {
-  skillBands: {
-    Listening: 7.0,
-    Reading: 6.5,
-    Writing: 6.0,
-    Speaking: 6.5,
-  },
-
-  xpTotal: 24500,
-
-  currentStreak: 12,
-
-  longestStreak: 21,
-
-  levelInfo: {
-    level: 5,
-    title: "Expert",
-    progressPercent: 49,
-  },
+  xpTotal: number
+  streak: StreakData
+  levelInfo: LevelInfo
+  skillBands: Partial<Record<Skill, number>>
 }
 
 function StatCard({
@@ -164,6 +146,10 @@ function StatCard({
 export default function DashboardClient({
   views,
   student,
+  xpTotal,
+  streak,
+  levelInfo,
+  skillBands,
 }: DashboardClientProps) {
   const [confettiFired, setConfettiFired] = useState(false)
 
@@ -173,11 +159,25 @@ export default function DashboardClient({
     once: true,
   })
 
+  // Same null-safe fallback pattern rewards-client already uses for streak.
+  const currentStreak = streak?.current_streak ?? 0
+  const longestStreak = streak?.longest_streak ?? 0
+
+  // Skill bands come from the student's latest graded attempts and may be
+  // partial (or entirely empty for a brand-new student) — default any
+  // skill with no attempt yet to 0 rather than crashing SkillProgress.
+  const resolvedSkillBands: Record<Skill, number> = {
+    Listening: skillBands.Listening ?? 0,
+    Reading: skillBands.Reading ?? 0,
+    Writing: skillBands.Writing ?? 0,
+    Speaking: skillBands.Speaking ?? 0,
+  }
+
   useEffect(() => {
     if (
       isInView &&
       !confettiFired &&
-      DASHBOARD_DEMO_DATA.currentStreak > 0
+      currentStreak > 0
     ) {
       setConfettiFired(true)
 
@@ -192,13 +192,12 @@ export default function DashboardClient({
 
       return () => clearTimeout(timeout)
     }
-  }, [isInView, confettiFired])
+  }, [isInView, confettiFired, currentStreak])
 
   return (
     <div className="flex flex-col gap-8">
       {/* 
           WELCOME HEADER
-          Real course count + demo level
       */}
 
       <div
@@ -228,7 +227,6 @@ export default function DashboardClient({
           </motion.p>
         </div>
 
-        {/* DEMO LEVEL */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -239,14 +237,14 @@ export default function DashboardClient({
           className="flex items-center gap-3 rounded-2xl border-3 border-ink bg-white px-5 py-3 shadow-hard"
         >
           <LevelBadge
-            level={DASHBOARD_DEMO_DATA.levelInfo.level}
-            title={DASHBOARD_DEMO_DATA.levelInfo.title}
+            level={levelInfo.level}
+            title={levelInfo.title}
             size="sm"
           />
 
           <div className="hidden sm:block">
             <p className="text-xs font-black uppercase tracking-wider text-slate">
-              {DASHBOARD_DEMO_DATA.levelInfo.title}
+              {levelInfo.title}
             </p>
 
             <div className="mt-1 h-2.5 w-28 overflow-hidden rounded-full border border-mist bg-mist">
@@ -254,7 +252,7 @@ export default function DashboardClient({
                 className="h-full rounded-full bg-gradient-to-r from-teal to-cyan"
                 initial={{ width: 0 }}
                 animate={{
-                  width: `${DASHBOARD_DEMO_DATA.levelInfo.progressPercent}%`,
+                  width: `${levelInfo.progressPercent}%`,
                 }}
                 transition={{
                   delay: 0.8,
@@ -269,15 +267,13 @@ export default function DashboardClient({
 
       {/* 
           STATS GRID
-          XP + streak = DEMO
-          Courses = REAL
       */}
 
       <div className="grid grid-cols-2 gap-4 lg:grid-cols-4">
         <StatCard
           icon={<XpGem size={24} />}
           label="Total XP"
-          value={DASHBOARD_DEMO_DATA.xpTotal}
+          value={xpTotal}
           accent="text-navy"
           bg="bg-gradient-to-br from-cyan to-cyan-light"
           border="border-teal/30"
@@ -288,13 +284,13 @@ export default function DashboardClient({
         <StatCard
           icon={<AnimatedFlame size={24} />}
           label="Current streak"
-          value={DASHBOARD_DEMO_DATA.currentStreak}
+          value={currentStreak}
           suffix="days"
           accent="text-navy"
           bg="bg-gradient-to-br from-orange-100 to-amber-50"
           border="border-orange-300"
           iconBg="bg-white/60"
-          highlight={DASHBOARD_DEMO_DATA.currentStreak > 0}
+          highlight={currentStreak > 0}
           delay={0.1}
         />
 
@@ -357,10 +353,9 @@ export default function DashboardClient({
 
       {/* 
           STREAK BANNER
-          DEMO
       */}
 
-      {DASHBOARD_DEMO_DATA.currentStreak > 0 && (
+      {currentStreak > 0 && (
         <motion.div
           initial={{
             opacity: 0,
@@ -381,16 +376,16 @@ export default function DashboardClient({
 
           <div>
             <p className="text-base font-black text-navy">
-              {DASHBOARD_DEMO_DATA.currentStreak === 1
+              {currentStreak === 1
                 ? "You just started your streak! 🔥"
-                : DASHBOARD_DEMO_DATA.currentStreak < 3
-                  ? `${DASHBOARD_DEMO_DATA.currentStreak} day streak! Keep it up! 🔥`
-                  : `${DASHBOARD_DEMO_DATA.currentStreak} day streak! You're on fire! 🔥🔥`}
+                : currentStreak < 3
+                  ? `${currentStreak} day streak! Keep it up! 🔥`
+                  : `${currentStreak} day streak! You're on fire! 🔥🔥`}
             </p>
 
             <p className="mt-0.5 text-sm font-medium text-slate">
               Longest streak:{" "}
-              {DASHBOARD_DEMO_DATA.longestStreak} days. Don't break the chain!
+              {longestStreak} days. Don't break the chain!
             </p>
           </div>
 
@@ -442,7 +437,8 @@ export default function DashboardClient({
           />
         </motion.section>
 
-        {/* DEMO SKILL DATA */}
+        {/* REAL SKILL DATA — latest graded band per skill,
+            0 for any skill with no attempt yet */}
 
         <motion.section
           initial={{
@@ -465,7 +461,7 @@ export default function DashboardClient({
           </h2>
 
           <SkillProgress
-            bands={DASHBOARD_DEMO_DATA.skillBands}
+            bands={resolvedSkillBands}
           />
         </motion.section>
       </div>
