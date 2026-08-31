@@ -17,6 +17,8 @@ import {
   BookOpen,
   HelpCircle,
   Globe,
+  AlertTriangle,
+  X,
 } from "lucide-react";
 
 type ChatMsg = {
@@ -96,6 +98,7 @@ export default function AiTutor({ userId, firstName }: { userId: string; firstNa
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [online, setOnline] = useState<boolean | null>(null);
+  const [showOfflineNotice, setShowOfflineNotice] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -193,6 +196,36 @@ export default function AiTutor({ userId, firstName }: { userId: string; firstNa
           {online === null ? "Connecting…" : online ? "AI Tutor online" : "AI Tutor offline"}
         </div>
       </div>
+
+      {/* Offline notice — the FastAPI engine is deployed on a free-tier host and
+          currently crashes / fails to start there due to its memory limit, so
+          the health check reports offline. Works fully when run locally. */}
+      <AnimatePresence initial={false}>
+        {online === false && showOfflineNotice && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="flex items-start gap-2.5 overflow-hidden rounded-[var(--radius-md)] px-4 py-3 text-sm"
+            style={{ background: "var(--warning-soft)", color: "var(--warning)" }}
+          >
+            <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
+            <p className="flex-1 leading-relaxed">
+              AI Tutor is offline on this deployed demo — its backend runs on a free-tier host
+              that doesn't have enough memory to keep the engine running. It works fully when
+              run locally.
+            </p>
+            <button
+              onClick={() => setShowOfflineNotice(false)}
+              aria-label="Dismiss"
+              className="shrink-0 rounded-full p-0.5 opacity-70 transition-opacity hover:opacity-100"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Chat window */}
       <div

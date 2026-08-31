@@ -7,6 +7,12 @@ The application is an **ERD-driven Next.js + Supabase rebuild** focused on IELTS
 ---
 
 🔗 **[Live Demo](https://ielts-beta-webapp-next.vercel.app/)**
+
+> ⚠️ **Note:** The AI Tutor feature is deployed separately (FastAPI + LangGraph) on a free-tier
+> host and currently crashes on startup due to that tier's memory limit — it will show as
+> offline on the live demo. The feature is fully functional when run locally; see
+> [Setup](#setup) below.
+
 🎥 **[Full Walkthrough Video](#)** — Student, Teacher, and Admin flows *(link pending)*
 
 ## Features
