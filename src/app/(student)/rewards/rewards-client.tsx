@@ -3,7 +3,6 @@
 import {
   useState,
   useEffect,
-  useCallback,
   useRef,
 } from "react";
 import {
@@ -14,7 +13,6 @@ import {
 import confetti from "canvas-confetti";
 import {
   TrendingUp,
-  Zap,
   Gift,
   Trophy,
 } from "lucide-react";
@@ -65,56 +63,6 @@ type RewardsClientProps = {
   stats: RewardsStats;
   mode: "demo" | "real";
 };
-
-function XpPopup({
-  amount,
-  x,
-  y,
-  onDone,
-}: {
-  amount: number;
-  x: number;
-  y: number;
-  onDone: () => void;
-}) {
-  useEffect(() => {
-    const timer = setTimeout(onDone, 1200);
-
-    return () => clearTimeout(timer);
-  }, [onDone]);
-
-  return (
-    <motion.div
-      initial={{
-        opacity: 0,
-        y: 0,
-        scale: 0.5,
-      }}
-      animate={{
-        opacity: 1,
-        y: -60,
-        scale: 1.2,
-      }}
-      exit={{
-        opacity: 0,
-        y: -100,
-        scale: 0.8,
-      }}
-      transition={{
-        duration: 1,
-        ease: "easeOut",
-      }}
-      className="fixed pointer-events-none z-[100] flex items-center gap-1 font-black text-xl text-green-600"
-      style={{
-        left: x,
-        top: y,
-      }}
-    >
-      <Zap className="h-5 w-5 fill-xp text-xp" />
-      +{amount.toLocaleString()} XP
-    </motion.div>
-  );
-}
 
 function MysteryChest() {
   const [shaking, setShaking] = useState(false);
@@ -182,7 +130,7 @@ function MysteryChest() {
 
           <p className="text-xs font-bold text-slate">
             {opened
-              ? `You won ${gems} gems! 🎉`
+              ? `You unlocked a +${gems} bonus! 🎉`
               : "Tap to open your daily reward"}
           </p>
         </div>
@@ -198,7 +146,7 @@ function MysteryChest() {
             className="flex items-center gap-1 text-gems font-black text-lg"
           >
             <Gift className="h-5 w-5" />
-            {gems}
+            +{gems}
           </motion.div>
         )}
       </div>
@@ -331,7 +279,7 @@ function LevelUpModal({
           className="mt-4 flex items-center justify-center gap-2 text-gems font-black text-2xl"
         >
           <Gift className="h-6 w-6" />
-          +100 Gems
+          +100 Bonus
         </motion.div>
       </motion.div>
     </motion.div>
@@ -348,20 +296,8 @@ export default function RewardsClient({
   stats,
   mode,
 }: RewardsClientProps) {
-  const [popups, setPopups] = useState<
-    {
-      id: number;
-      amount: number;
-      x: number;
-      y: number;
-    }[]
-  >([]);
-
   const [showLevelUp, setShowLevelUp] =
     useState(false);
-
-  const [xpTotal, setXpTotal] =
-    useState(stats.xpTotal);
 
   const pageRef = useRef<HTMLDivElement | null>(
     null
@@ -370,16 +306,6 @@ export default function RewardsClient({
   const isInView = useInView(pageRef, {
     once: true,
   });
-
-  /*
-   * Keep the database XP as the initial value.
-   *
-   * Interactive demo XP is local UI state only.
-   * It does NOT pretend to persist fake rewards into Supabase.
-   */
-  useEffect(() => {
-    setXpTotal(stats.xpTotal);
-  }, [stats.xpTotal]);
 
   useEffect(() => {
     if (isInView) {
@@ -398,40 +324,6 @@ export default function RewardsClient({
       });
     }
   }, [isInView]);
-
-  const spawnXpPopup = useCallback(
-    (amount: number) => {
-      const id = Date.now() + Math.random();
-
-      const w =
-        typeof window !== "undefined"
-          ? window.innerWidth
-          : 1200;
-
-      const h =
-        typeof window !== "undefined"
-          ? window.innerHeight
-          : 800;
-
-      const x =
-        Math.random() * w * 0.6 + w * 0.2;
-
-      const y = h * 0.5;
-
-      setPopups((prev) => [
-        ...prev,
-        {
-          id,
-          amount,
-          x,
-          y,
-        },
-      ]);
-
-      setXpTotal((prev) => prev + amount);
-    },
-    []
-  );
 
   const allAchievementCodes = [
     "first_steps",
@@ -491,25 +383,6 @@ export default function RewardsClient({
         )}
       </AnimatePresence>
 
-      <AnimatePresence>
-        {popups.map((popup) => (
-          <XpPopup
-            key={popup.id}
-            amount={popup.amount}
-            x={popup.x}
-            y={popup.y}
-            onDone={() =>
-              setPopups((prev) =>
-                prev.filter(
-                  (item) =>
-                    item.id !== popup.id
-                )
-              )
-            }
-          />
-        ))}
-      </AnimatePresence>
-
       {/* Header */}
       <motion.div
         initial={{
@@ -549,21 +422,9 @@ export default function RewardsClient({
 
           <p className="text-sm font-bold text-slate mt-1">
             {stats.levelInfo.title} ·{" "}
-            {xpTotal.toLocaleString()} XP total
+            {stats.xpTotal.toLocaleString()} XP total
           </p>
         </div>
-
-        {/* Keep this button as a cinematic/demo interaction.
-            It does not write fake XP to the database. */}
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          onClick={() => spawnXpPopup(500)}
-          className="hidden sm:flex items-center gap-2 bg-xp/10 border-2 border-xp/30 text-xp px-4 py-2 rounded-xl font-black text-sm hover:bg-xp/20 transition-colors"
-        >
-          <Zap className="h-4 w-4" />
-          Test XP Popup
-        </motion.button>
       </motion.div>
 
       {/* Demo-only chest interaction.
@@ -639,8 +500,7 @@ export default function RewardsClient({
             y: -5,
             scale: 1.02,
           }}
-          className="rounded-2xl border-3 border-ink bg-white p-6 shadow-hard hover:shadow-brutalist transition-all cursor-pointer"
-          onClick={() => spawnXpPopup(1000)}
+          className="rounded-2xl border-3 border-ink bg-white p-6 shadow-hard"
         >
           <div className="flex items-center gap-4">
             <div className="animate-gem-sparkle">
@@ -653,14 +513,10 @@ export default function RewardsClient({
               </p>
 
               <motion.p className="font-display text-4xl font-black text-green-600">
-                {xpTotal.toLocaleString()}
+                {stats.xpTotal.toLocaleString()}
               </motion.p>
             </div>
           </div>
-
-          <p className="text-xs font-bold text-slate mt-2">
-            Click to earn bonus XP! 🎉
-          </p>
         </motion.div>
 
         {/* Current streak */}
@@ -829,12 +685,7 @@ export default function RewardsClient({
                     type: "spring",
                     stiffness: 200,
                   }}
-                  className="flex items-center justify-between rounded-xl border-2 border-ink bg-white px-5 py-3 shadow-hard hover:shadow-brutalist transition-all cursor-pointer"
-                  onClick={() =>
-                    spawnXpPopup(
-                      entry.amount
-                    )
-                  }
+                  className="flex items-center justify-between rounded-xl border-2 border-ink bg-white px-5 py-3 shadow-hard"
                 >
                   <div className="flex items-center gap-3">
                     <div className="w-8 h-8 rounded-full bg-green-50 flex items-center justify-center border-2 border-green-200">

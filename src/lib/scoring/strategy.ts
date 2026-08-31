@@ -39,8 +39,7 @@ export class ObjectiveScoringStrategy implements ScoringStrategy {
 }
 
 /**
- * Writing & Speaking: no automated grading in V2 (no AI chatbot — see
- * architecture §11). The attempt is recorded and flagged for a teacher to
+ * Writing & Speaking: no automated grading. The attempt is recorded and flagged for a teacher to
  * grade against the rubric; band stays null until then.
  */
 export class SubjectiveScoringStrategy implements ScoringStrategy {

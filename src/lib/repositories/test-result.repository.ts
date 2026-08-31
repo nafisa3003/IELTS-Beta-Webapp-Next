@@ -30,11 +30,25 @@ export class TestResultRepository {
       .order("submit_time", { referencedTable: "test_attempts", ascending: false });
     if (error) throw error;
 
+    // DB columns are lowercase (listening/reading/writing/speaking) but the
+    // Skill type uses capitalized labels (Listening/Reading/...) — map
+    // between them explicitly instead of assuming the keys line up.
+    const COLUMN_BY_SKILL: Record<Skill, "listening" | "reading" | "writing" | "speaking"> = {
+      Listening: "listening",
+      Reading: "reading",
+      Writing: "writing",
+      Speaking: "speaking",
+    };
+
     const latest: Partial<Record<Skill, number>> = {};
-    for (const row of (data ?? []) as unknown as Record<Skill | "test_attempts", number | null>[]) {
+    for (const row of (data ?? []) as unknown as Record<
+      "listening" | "reading" | "writing" | "speaking" | "test_attempts",
+      number | null
+    >[]) {
       for (const skill of ["Listening", "Reading", "Writing", "Speaking"] as Skill[]) {
-        if (latest[skill] == null && row[skill] != null) {
-          latest[skill] = row[skill] as number;
+        const column = COLUMN_BY_SKILL[skill];
+        if (latest[skill] == null && row[column] != null) {
+          latest[skill] = row[column] as number;
         }
       }
     }
