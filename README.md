@@ -1,6 +1,6 @@
 # IELTS-Beta-WebApp-Next
 
-<video src="https://github.com/user-attachments/assets/b9edd5e2-a95d-44d9-80ee-3b3201973a61" controls autoplay loop muted width="100%"></video>
+<video src="https://github.com/user-attachments/assets/8d61846a-5737-4941-a485-1bea358b2e18" controls autoplay loop muted width="100%"></video>
 
 IELTS-Beta-WebApp-Next is a full-stack IELTS learning platform developed as a university capstone project.
 The application is an **ERD-driven Next.js + Supabase rebuild** focused on IELTS learning, assessment, progress tracking, and role-based experiences for Students, Teachers, and Administrators.
